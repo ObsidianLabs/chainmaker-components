@@ -12,7 +12,6 @@
     "node-sass": "npm:sass"
   },
   "workspaces": [
-    "../chainmaker-sdk",
     "packages/*",
     "../electron-components/packages/*"
   ],
@@ -21,18 +20,5 @@
   },
   "resolutions": {
     "rollup": "^2.68.0"
-  },
-  "version": "1.0.0",
-  "main": "dangerfile.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ObsidianLabs/chainmaker-components.git"
-  },
-  "keywords": [],
-  "author": "",
-  "bugs": {
-    "url": "https://github.com/ObsidianLabs/chainmaker-components/issues"
-  },
-  "homepage": "https://github.com/ObsidianLabs/chainmaker-components#readme",
-  "description": ""
+  }
 }

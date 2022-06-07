@@ -1,0 +1,38 @@
+{
+  "name": "@obsidians/eth-components",
+  "license": "GPL-3.0",
+  "private": true,
+  "engines": {
+    "node": "16"
+  },
+  "scripts": {
+    "build": "node init.js"
+  },
+  "dependencies": {
+    "node-sass": "npm:sass"
+  },
+  "workspaces": [
+    "../chainmaker-sdk",
+    "packages/*",
+    "../electron-components/packages/*"
+  ],
+  "devDependencies": {
+    "danger": "^11.0.2"
+  },
+  "resolutions": {
+    "rollup": "^2.68.0"
+  },
+  "version": "1.0.0",
+  "main": "dangerfile.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ObsidianLabs/chainmaker-components.git"
+  },
+  "keywords": [],
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/ObsidianLabs/chainmaker-components/issues"
+  },
+  "homepage": "https://github.com/ObsidianLabs/chainmaker-components#readme",
+  "description": ""
+}

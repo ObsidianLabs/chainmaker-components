@@ -13,7 +13,8 @@
   },
   "workspaces": [
     "packages/*",
-    "../electron-components/packages/*"
+    "../electron-components/packages/*",
+    "../chainmaker-sdk"
   ],
   "devDependencies": {
     "danger": "^11.0.2"

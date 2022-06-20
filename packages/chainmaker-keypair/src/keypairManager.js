@@ -1,6 +1,7 @@
 import React from 'react'
 import { IpcChannel } from '@obsidians/ipc'
 import redux from '@obsidians/redux'
+
 class KeypairManager {
   constructor () {
     this.channel = new IpcChannel('keypair')

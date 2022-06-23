@@ -1,1 +1,1 @@
-# `@obsidians/eth-sdk`
+# `@obsidians/chainmaker-sdk`

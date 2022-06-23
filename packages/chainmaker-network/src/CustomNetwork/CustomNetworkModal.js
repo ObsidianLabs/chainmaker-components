@@ -156,7 +156,7 @@ export default class CustomNetworkModal extends PureComponent {
           TableHead={(
             <tr>
               <th style={{ width: '20%' }}>name</th>
-              <th style={{ width: '55%' }}>rpc url</th>
+              <th style={{ width: '55%' }}>IP adress</th>
               <th></th>
             </tr>
           )}

@@ -145,6 +145,7 @@ export default class ImportKeypairModal extends PureComponent {
     let crtfingerprint = ''
     for (let key of keys){
       let fingerprint = await this.validCert(secret[key])
+      console.log('fingerprint', fingerprint)
       if (fingerprint === false) {
         valid = false
       } else if (key === 'signCrt') {

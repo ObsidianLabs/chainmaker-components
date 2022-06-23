@@ -177,6 +177,17 @@ const getChainConfigByBlockHeight = async (sdk, blockHeight) => {
   }
 }
 
+
+const getLastBlock = async (sdk, withRWSet) => {
+  try {
+    const response = await sdk.callSystemContract.getLastBlock(withRWSet)
+    console.log('getLastBlock-response', response)
+    return response
+  } catch (e) {
+    console.log('getLastBlock failed', e)
+  }
+}
+
 module.exports = {
   subscribeBlock,
   subscribeTx,
@@ -188,5 +199,6 @@ module.exports = {
   getBlockByTxId,
   getTxByTxId,
   getChainInfoConfig,
-  getChainConfigByBlockHeight
+  getChainConfigByBlockHeight,
+  getLastBlock
 }

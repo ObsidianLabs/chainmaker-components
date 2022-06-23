@@ -2,21 +2,22 @@ const { Sdk, User, Utils } = require('chainmaker-sdk');
 const fs = require('fs')
 const path = require('path');
 const methods = require('./SdkMethods')
+const os = require('os');
 
-const getFilePath = path => path.join(__dirname, path)
-const readFile = path => fs.readFileSync(path.join(__dirname, path))
-// const getNodeConfig = ({ nodeAddr, tlsEnable, caPath, clientKeyPath, clientCertPath, hostName }) => {
-//   return {
-//     nodeAddr,
-//     tlsEnable,
-//     options: {
-//       pem: readFile(caPath),
-//       clientKey: readFile(clientCertPath),
-//       clientCert: readFile(clientKeyPath),
-//       hostName
-//     }
-//   }
-// }
+const convertToBuffer = str => Buffer.from(JSON.parse(JSON.stringify(str)), 'utf-8')
+
+const getNodeConfig = ({ nodeAddr, tlsEnable, options}) => {
+  return [{
+    nodeAddr,
+    tlsEnable,
+    options: {
+      pem: convertToBuffer(options.pem),
+      clientKey: convertToBuffer(options.clientKey),
+      clientCert: convertToBuffer(options.clientCert),
+      hostName: options.hostName
+    }
+  }]
+}
 
 module.exports = class SdkClient {
   constructor() {
@@ -25,31 +26,46 @@ module.exports = class SdkClient {
     this.sdkMethods = null
     this.userList = []
     this.nodeConfigArray = []
+    this.userKeyPathFile = null
+    this.userCrtPathFile= null
   }
 
-  // updateNodeConfigArr = (nodeInfo) => {
-  //   this.nodeConfigArray = nodeInfo.reduce((prev, cur) => {
-  //     prev.push(getNodeConfig(cur))
-  //     return prev
-  //   }, [])
-  // }
+   saveToTemp({ userKeyString, userCertString }) {
+    this.userKeyPathFile = path.join(os.tmpdir(), 'tempUser.key')
+    this.userCrtPathFile = path.join(os.tmpdir(), 'tempUser.crt')
+    fs.writeFileSync(this.userKeyPathFile, userKeyString)
+    fs.writeFileSync(this.userCrtPathFile, userCertString)
+  }
 
-  initSDK({ chainId, orgId, userKeyPath, userCertPath, nodeConfigArray, timeout }) {
+  removeTemp() {
+    if (!this.userKeyPathFile || !this.userCrtPathFile) return
+    fs.unlinkSync(this.userKeyPathFile)
+    fs.unlinkSync(this.userCrtPathFile)
+    this.userCrtPathFile = this.userCrtPathFile = ''
+  }
+
+  initSDK({ chainId, orgId, userKeyString, userCertString, nodeConfigArray, timeout }) {
+    if (!this.userCrtPathFile || !this.userKeyPathFile) {
+      this.saveToTemp({ userKeyString, userCertString })
+    }
     this.sdkInstance = new Sdk(
       chainId,
       orgId,
-      userKeyPathFile = getFilePath(userKeyPath),
-      userCertPathFile = getFilePath(userCertPath),
-      nodeConfigArray,
-      timeout
+      this.userKeyPathFile,
+      this.userCrtPathFile,
+      getNodeConfig(nodeConfigArray[0]),
+      3000
     )
   }
 
-  initUserList({ orgId, userKeyPath, userCertPath }) {
+  initUserList({ orgId, userKeyString, userCertString }) {
+    if (!this.userCrtPathFile || !this.userKeyPathFile) {
+      this.saveToTemp({ userKeyString, userCertString })
+    }
     const newUser = new User(
       orgId,
-      userKeyPathFile = getFilePath(userKeyPath),
-      userCertPathFile = getFilePath(userCertPath)
+      this.userKeyPathFile,
+      this.userCrtPathFile,
     )
     this.userList.push(newUser)
   }
@@ -59,8 +75,7 @@ module.exports = class SdkClient {
     this.callSdkMethods = callMethods(this.sdkInstance, methods)
   }
 
-
   invokeMethods(name, ...data) {
-    this.callSdkMethods(name, ...data)
+   return this.callSdkMethods(name, ...data)
   }
 }

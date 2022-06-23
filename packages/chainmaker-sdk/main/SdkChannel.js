@@ -1,5 +1,5 @@
 const { IpcChannel } = require('@obsidians/ipc')
-const { SdkClient } = require('./SdkClient')
+const SdkClient  = require('./SdkClient')
 
 module.exports = class SdkChannel extends IpcChannel {
   constructor () {
@@ -14,7 +14,17 @@ module.exports = class SdkChannel extends IpcChannel {
     this.sdkclient.initMethods()
   }
 
-  call({ methodName, ...data }) {
-   return this.sdkclient.initMethods(methodName, ...data)
+  call(methodName, ...data) {
+    return this.sdkclient.invokeMethods(methodName, ...data)
+  }
+}
+
+class ExplorerChannel extends IpcChannel {
+  constructor() {
+    super('explorer')
+  }
+
+  async GET(networkId, query) {
+      return { result: [] }
   }
 }

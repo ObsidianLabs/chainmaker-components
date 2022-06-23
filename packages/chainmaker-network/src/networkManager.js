@@ -1,5 +1,5 @@
 import platform from '@obsidians/platform'
-import headerActions from '@obsidians/eth-header'
+import headerActions from '@obsidians/chainmaker-header'
 import notification from '@obsidians/notification'
 import redux from '@obsidians/redux'
 import { t } from '@obsidians/i18n'

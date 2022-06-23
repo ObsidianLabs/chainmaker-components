@@ -60,7 +60,6 @@ export default class KeypairManagerModal extends PureComponent {
     this.listenKeypairChange = keypairManager.onUpdated(keypairs => {
       this.setState({ keypairs })
     })
-    console.log('hee', this.state.keypairs)
   }
 
   componentWillUnmount(){
@@ -71,7 +70,6 @@ export default class KeypairManagerModal extends PureComponent {
   async refresh () {
     this.setState({ loading: true })
     const keypairs = await keypairManager.loadAllKeypairs()
-    console.log(')))))))', keypairs)
     this.setState({ keypairs, loading: false })
   }
 

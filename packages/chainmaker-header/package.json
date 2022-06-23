@@ -1,7 +1,7 @@
 {
-  "name": "@obsidians/chainmaker-node",
+  "name": "@obsidians/chainmaker-header",
   "version": "0.3.0",
-  "description": "Ethereum node",
+  "description": "Black IDE header",
   "author": "Phil <qft.gtr@gmail.com>",
   "license": "GPL-3.0",
   "source": "src/index.js",
@@ -17,10 +17,16 @@
     "prepare": "yarn build"
   },
   "dependencies": {
+    "@obsidians/auth": "^0.3.0",
     "@obsidians/chainmaker-network": "^0.3.0",
-    "@obsidians/notification": "^0.3.0",
-    "@obsidians/terminal": "^0.3.0",
-    "@obsidians/ui-components": "^0.3.0"
+    "@obsidians/eth-project": "^0.3.0",
+    "@obsidians/keypair": "^0.3.0",
+    "@obsidians/navbar": "^0.3.0",
+    "@obsidians/redux": "^0.3.0",
+    "@obsidians/i18n": "^0.3.0",
+    "@obsidians/ui-components": "^0.3.0",
+    "@obsidians/workspace": "^0.3.0",
+    "@obsidians/eth-sdk": "^0.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.7.5",
@@ -43,8 +49,7 @@
   },
   "peerDependencies": {
     "react": "*",
-    "react-dom": "*",
-    "react-router-cache-route": "*"
+    "react-dom": "*"
   },
   "eslintConfig": {
     "extends": "react-app"

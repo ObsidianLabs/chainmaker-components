@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import headerActions from '@obsidians/eth-header'
+import headerActions from '@obsidians/chainmaker-header'
 import {
   Modal,
   Table,

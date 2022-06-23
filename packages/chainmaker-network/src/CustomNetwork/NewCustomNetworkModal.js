@@ -5,7 +5,7 @@ import {
   FormGroup,
   Label
 } from '@obsidians/ui-components'
-import headerActions from '@obsidians/eth-header'
+import headerActions from '@obsidians/chainmaker-header'
 import redux from '@obsidians/redux'
 import notification from '@obsidians/notification'
 import { Input } from 'reactstrap'

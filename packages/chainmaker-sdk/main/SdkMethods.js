@@ -177,7 +177,9 @@ const getChainConfigByBlockHeight = async (sdk, blockHeight) => {
   }
 }
 
-
+/**
+ * 获取最新区块信息
+ * */
 const getLastBlock = async (sdk, withRWSet) => {
   try {
     const response = await sdk.callSystemContract.getLastBlock(withRWSet)

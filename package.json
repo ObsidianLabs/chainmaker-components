@@ -13,6 +13,7 @@
   },
   "workspaces": [
     "packages/*",
+    "../eth-components/packages/*",
     "../electron-components/packages/*",
     "../chainmaker-sdk"
   ],

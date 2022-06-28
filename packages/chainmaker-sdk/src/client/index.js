@@ -46,8 +46,20 @@ export default class InvokeClient {
     const { block: { header } } = await this.invokeCall('getLastBlock', true)
     return {
       number: header.blockHeight,
-      timestamp: header.blockTimestamp
+      timestamp: header.blockTimestamp,
+      blockHash: header.blockHash,
+      blockVersion: header.blockVersion
     }
+  }
+
+  async getBlockInfo(blockStr) {
+    const resultbyHeight = await this.invokeCall('getBlockByHeight', blockStr)
+    const resultByHash = await this.invokeCall('getBlockByHash', blockStr)
+    console.log('resultbyHeight9', resultbyHeight)
+    console.log('resultByHash9', resultByHash)
+    if(!!resultByHash && !!resultByHash) return undefined
+    if(!!resultbyHeight) return resultbyHeight
+    if(!!resultByHash) return resultByHash
   }
 
   async latest() {

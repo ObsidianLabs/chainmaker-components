@@ -93,7 +93,7 @@ const getNodeChainList = async (sdk, nodeAddr) => {
 /**
  * 根据区块高度查询区块
  * blockHeight: 区块高度,若为-1，将返回最新区块(number)
- *  withRWSet: 是否返回读写集(boolean)
+ * withRWSet: 是否返回读写集(boolean)
  * */
 const getBlockByHeight = async (sdk, blockHeight, withRWSet) => {
   try {
@@ -113,10 +113,10 @@ const getBlockByHeight = async (sdk, blockHeight, withRWSet) => {
 const getBlockByHash = async (sdk, blockHash, withRWSet) => {
   try {
     const response = await sdk.callSystemContract.getBlockByHash(blockHash, withRWSet);
-    console.log('getBlockByHeight-response', response)
+    console.log('getBlockByHash-response', response)
     return response
   } catch (e) {
-    console.log('getBlockByHeight failed', e)
+    console.log('getBlockByHash failed', e)
   }
 }
 

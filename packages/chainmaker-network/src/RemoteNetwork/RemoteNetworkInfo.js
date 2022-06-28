@@ -31,7 +31,7 @@ export default class RemoteNetworkInfo extends PureComponent {
             {
               info?.chainId &&
               <TableCardRow
-                name='Chain ID'
+                name='ChainId'
                 badge={info?.chainId}
               />
             }
@@ -40,6 +40,13 @@ export default class RemoteNetworkInfo extends PureComponent {
               <TableCardRow
                 name='ENS'
                 badge={info?.ensAddress}
+              />
+            }
+            {
+              status?.blockVersion &&
+              <TableCardRow
+                name={'BlockVersion'}
+                badge={status?.blockVersion}
               />
             }
           </TableCard>
@@ -51,6 +58,13 @@ export default class RemoteNetworkInfo extends PureComponent {
               <TableCardRow
                 name={t('header.title.blockNumber')}
                 badge={status?.number}
+              />
+            }
+            {
+              status?.blockHash &&
+              <TableCardRow
+                name={'BlockHash'}
+                badge={status?.blockHash}
               />
             }
             {

@@ -21,10 +21,10 @@ const networks = [
   {
     id: 'testnode-1',
     group: 'Test Chain',
-    name: 'TestNet',
-    fullName: 'Chainmaker TestNet',
+    name: 'org1-cmtestnet',
+    fullName: 'org1-cmtestnet',
     icon: 'fas fa-globe',
-    notification: `${t('network.network.switchedTo')} <b>Chainmaker TestNet</b>.`,
+    notification: `${t('network.network.switchedTo')} <b>Chainmaker org1-cmtestnet</b>.`,
     url: '152.136.217.46:12302',
     chainId: 'chainmaker_testnet_chain',
     symbol: '',

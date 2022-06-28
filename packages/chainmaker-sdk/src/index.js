@@ -28,7 +28,9 @@ const getFinalSDK = ({ kp, networks,  customNetworks = [], utils,  Client }) => 
 
     dispose() { this.client.dispose() }
 
-    isValidAddress(address) { }
+    isValidAddress(address) { 
+
+    }
 
     async networkInfo() { 
       return this.client.networkInfo()
@@ -36,6 +38,10 @@ const getFinalSDK = ({ kp, networks,  customNetworks = [], utils,  Client }) => 
 
     async getStatus() { 
       return this.client.getStatus()
+    }
+
+    async getBlockInfo(blockStr) {
+      return this.client.getBlockInfo(blockStr)
     }
 
     async latest() { 

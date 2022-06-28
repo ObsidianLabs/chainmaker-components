@@ -1,15 +1,14 @@
 import React, { PureComponent } from 'react'
-
 import {
   Modal,
   DebouncedFormGroup,
   FormGroup,
-  Label,
+  Label
 } from '@obsidians/ui-components'
-import headerActions from '@obsidians/eth-header'
+import headerActions from '@obsidians/chainmaker-header'
 import redux from '@obsidians/redux'
 import notification from '@obsidians/notification'
-
+import { Input } from 'reactstrap'
 import networkManager from '../networkManager'
 import { t } from '@obsidians/i18n'
 
@@ -20,31 +19,40 @@ export default class CustomNetworkModal extends PureComponent {
       pending: false,
       status: null,
       modify: false,
-      option: {},
+      option: { tlsEnable: false },
       originalOption: {},
     }
     this.modal = React.createRef()
     this.input = React.createRef()
   }
 
-  openModal = (modify = false, option = {}) => {
-    this.name = option.name
-    this.setState({ pending: false, status: null, modify, option, originalOption: option })
+  openModal = (modify = false, newOption = {}) => {
+    this.name = newOption.hostName
+    this.setState({
+      pending: false,
+      status: null,
+      modify,
+      option: { ...this.setState.option, ...newOption },
+      originalOption: newOption
+    })
     this.modal.current?.openModal()
-    setTimeout(() => this.input.current?.focus(), 100)
+    setTimeout(() => this.input.current?.focus(), 50)
   }
 
   tryCreateSdk = async option => {
+
     this.setState({ pending: true })
     try {
       const status = await networkManager.updateCustomNetwork(option)
+      console.log('tryCreateSdk', status)
       if (status) {
         this.setState({ pending: false, status })
         return
       }
-    } catch { }
-    notification.error(t('network.custom.err'), t('network.custom.errText'))
-    this.setState({ pending: false })
+    } catch (error) {
+      notification.error(t('network.custom.err'), t('network.custom.errText'))
+      this.setState({ pending: false })
+    }
   }
 
   onConfirm = async () => {
@@ -54,7 +62,7 @@ export default class CustomNetworkModal extends PureComponent {
     const connected = customNetworkMap[option.name]?.active;
 
     if (customNetworkNames.includes(option.name) && !modify) {
-      notification.error(t('network.custom.invalidName'), t('network.custom.invalidNameText', {name: option.name}))
+      notification.error(t('network.custom.invalidName'), t('network.custom.invalidNameText', { name: option.name }))
       return
     } else {
       if (!status) {
@@ -106,19 +114,17 @@ export default class CustomNetworkModal extends PureComponent {
         headerActions.updateNetwork(option.name)
         networkManager.setNetwork({
           ...option,
-          id: option.name
+          name: option.hostName
         })
         return
       }
-    } catch { }
-    notification.error(t('network.custom.err'), t('network.custom.errText'))
-    redux.dispatch('CHANGE_NETWORK_STATUS', false)
+    } catch (error) {
+      notification.error(t('network.custom.err'), t('network.custom.errText'))
+      redux.dispatch('CHANGE_NETWORK_STATUS', false)
+    }
   }
 
   render() {
-    const {
-      placeholder = 'http(s)://...',
-    } = this.props
     const { modify, pending, status, option } = this.state
 
     return (
@@ -128,32 +134,60 @@ export default class CustomNetworkModal extends PureComponent {
         pending={pending && t('network.custom.try')}
         textConfirm={status ? modify ? t('network.custom.update') : t('network.custom.add') : t('network.custom.check')}
         onConfirm={this.onConfirm}
-        confirmDisabled={!option.name || !/^[0-9a-zA-Z\-_]*$/.test(option.name) || !option.url}
-      >
+        confirmDisabled={!option.hostName || !option.orgId || !option.chainId || !option.ipAdress || !option.pem}>
         <DebouncedFormGroup
           ref={this.input}
-          label='Name'
+          label='Host Name'
           maxLength='50'
-          value={option.name}
-          onChange={name => this.setState({ option: { ...option, name } })}
-          validator={v => !/^[0-9a-zA-Z\-_]*$/.test(v) && 'Network name can only contain letters, digits, dash or underscore.'}
+          value={option.hostName}
+          placeholder='Please enter the host name'
+          onChange={hostName => this.setState({ option: { ...option, hostName } })}
         />
         <DebouncedFormGroup
-          label='URL of node rpc'
-          placeholder={placeholder}
-          maxLength='300'
-          value={option.url}
-          onChange={url => this.setState({ status: null, option: { ...option, url } })}
+          label='OrgId'
+          maxLength='50'
+          value={option.orgId}
+          onChange={orgId => this.setState({ option: { ...option, orgId } })}
+          placeholder='Please enter the organization Id'
+          validator={v => !/^[0-9a-zA-Z\-_]*$/.test(v) && 'orgId can only contain letters, digits, dash or underscore.'}
         />
-        {
-          status &&
-          <FormGroup>
-            <Label>Network info</Label>
-            <pre className='text-body pre-wrap break-all small user-select mb-0'>
-              {JSON.stringify(status, null, 2)}
-            </pre>
-          </FormGroup>
-        }
+        <DebouncedFormGroup
+          label='ChainId'
+          maxLength='50'
+          value={option.chainId}
+          onChange={chainId => this.setState({ option: { ...option, chainId } })}
+          placeholder='Please enter the chainId'
+          validator={v => !/^[0-9a-zA-Z\-_]*$/.test(v) && 'chainId can only contain letters, digits, dash or underscore.'}
+        />
+        <DebouncedFormGroup
+          label='IP Address: Port'
+          maxLength='50'
+          placeholder='Please enter the IP adress with port number(127.0.0.1:8080)'
+          value={option.ipAdress}
+          onChange={ipAdress => this.setState({ option: { ...option, ipAdress } })}
+        />
+        <FormGroup check className={'actionConfirm__checkbox'} style={{
+          paddingTop: '15px',
+          paddingBottom: '15px'
+        }}>
+          <Input type='checkbox' id='enablTls'
+            onChange={tlsEnable => this.setState({ option: { ...option, tlsEnable } })}
+            checked={option.tlsEnable} />
+          <Label check htmlFor='enablTls'>Enable TTLS</Label>
+        </FormGroup>
+        <DebouncedFormGroup
+          size='sm'
+          rows='3'
+          label='Pem Certificate'
+          type='textarea'
+          importFromFile='.crt'
+          placeholder='Please enter the Pem Certificate'
+          formGroupClassName='d-flex flex-column flex-grow-1 code'
+          inputGroupClassName='flex-grow-1'
+          className='h-100 code'
+          value={option.pem}
+          onChange={pem => this.setState({ option: { ...option, pem } })}
+        />
       </Modal>
     )
   }

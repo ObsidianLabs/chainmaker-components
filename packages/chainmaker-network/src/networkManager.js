@@ -1,8 +1,9 @@
 import platform from '@obsidians/platform'
-import headerActions from '@obsidians/eth-header'
+import headerActions from '@obsidians/chainmaker-header'
 import notification from '@obsidians/notification'
 import redux from '@obsidians/redux'
 import { t } from '@obsidians/i18n'
+import keypairManager from '@obsidians/keypair'
 
 import { getCachingKeys, dropByCacheKey } from 'react-router-cache-route'
 
@@ -16,12 +17,10 @@ class NetworkManager {
 
   addSdk(Sdk, networks) {
     networks.forEach(n => this.Sdks.set(n.id, Sdk))
+
     this.networks = [...this.networks, ...networks]
 
     const enabled = !process.env.REACT_APP_DISABLE_BROWSER_EXTENSION
-    if (platform.isWeb && enabled && Sdk.InitBrowserExtension) {
-      this.browserExtension = Sdk.InitBrowserExtension(this)
-    }
   }
 
   get networkId() {
@@ -58,17 +57,38 @@ class NetworkManager {
     this.Sdks.delete(networkId)
   }
 
-  newSdk(params) {
+  async getUserKeyFilePath() {
+    const allKeys = await keypairManager.loadAllKeypairs()
+    if(!allKeys.length) return null
+    const readKeys = await keypairManager.getSecret(allKeys[0].address)
+    return JSON.parse(readKeys)
+
+  }
+
+  async newSdk(params) {
     const networkId = params.id.split('.')[0]
     const Sdk = this.Sdks.get(networkId)
-    if (!Sdk) {
+    const userKeys = await this.getUserKeyFilePath()
+
+    if (!userKeys) {
+      notification.error('No Available Keypiar', 'Please create or import a keypair in the keypair manager first.')
       return null
     }
+    if (!Sdk) return null
+    const { nodeConfigArray } = params
+    params.nodeConfigArray[0].options = {
+      ...nodeConfigArray[0].options,
+      clientKey: userKeys.tlsKey,
+      clientCert: userKeys.tlsCrt
+    }
+    params.userCertString = userKeys.signCrt
+    params.userKeyString = userKeys.signKey
+
     return new Sdk(params)
   }
 
   async updateSdk(params) {
-    this._sdk = this.newSdk({ ...this.network, ...params })
+    this._sdk = await this.newSdk({ ...this.network, ...params })
     await new Promise(resolve => {
       const h = setInterval(() => {
         if (!this.sdk) {
@@ -105,54 +125,8 @@ class NetworkManager {
 
     redux.dispatch('ACTIVE_CUSTOM_NETWORK', network)
 
-    if (this.browserExtension && this.browserExtension?.ethereum && this.browserExtension.ethereum.isConnected() && network.chainId) {
-      const chainId = this.browserExtension.getChainId ? await this.browserExtension.getChainId()
-        : await this.browserExtension.ethereum.request({ method: 'eth_chainId' })
-      
-        const switchChain = this.browserExtension?.switchChain?.bind(this.browserExtension) || (chainId => {
-        return this.browserExtension.ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{
-            chainId,
-          }]
-        })
-      })
-      
-      const addChain = this.browserExtension?.addChain?.bind(this.browserExtension) || (({ chainId, chainName, rpcUrls }) => {
-        return this.browserExtension.ethereum.request({
-          method: 'wallet_addEthereumChain',
-          params: [{
-            chainId,
-            chainName,
-            rpcUrls,
-          }],
-        })
-      })
-      
-      const hexChainId = `0x${network.chainId.toString(16)}`
-      
-      if (chainId !== hexChainId) {
-        try {
-          await switchChain(hexChainId)
-        } catch (e) {
-          if (e.code === 4902) {
-            await addChain({
-              chainId: hexChainId,
-              chainName: network.fullName,
-              rpcUrls: [network.url],
-            })
-            await switchChain(hexChainId)
-          }
-        }
-      }
-    }
-
     if (!network || network.id === redux.getState().network) {
       return
-    }
-
-    if (process.env.DEPLOY === 'bsn' && network.projectKey) {
-      notification.warning(`${network.name}`, `The current network ${network.name} enables a project key, please turn it off in the BSN portal.`, 5)
     }
 
     const cachingKeys = getCachingKeys()
@@ -161,8 +135,7 @@ class NetworkManager {
     this.network = network
     if (network.id && network.id !== 'dev') {
       try {
-        this._sdk = this.newSdk(network)
-        this._sdk.updateEIP1559Support()
+        this._sdk = await this.newSdk(network)
       } catch (error) {
         this._sdk && this._sdk.dispose()
         this._sdk = null
@@ -205,7 +178,8 @@ class NetworkManager {
   }
 
   async createSdk(params) {
-    const sdk = this.newSdk(params)
+    const sdk = await this.newSdk(params)
+  
     try {
       const info = await sdk.networkInfo()
       if (params.id !== 'custom') this._sdk = sdk

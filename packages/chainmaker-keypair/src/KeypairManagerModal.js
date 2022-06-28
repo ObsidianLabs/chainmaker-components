@@ -65,6 +65,7 @@ export default class KeypairManagerModal extends PureComponent {
   componentWillUnmount(){
     this.listenKeypairChange && this.listenKeypairChange()
   }
+  
 
   async refresh () {
     this.setState({ loading: true })

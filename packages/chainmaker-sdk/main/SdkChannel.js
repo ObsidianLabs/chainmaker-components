@@ -1,39 +1,30 @@
 const { IpcChannel } = require('@obsidians/ipc')
-const EthersClient = require('./EthersClient')
-const RpcServer = require('./RpcServer')
+const SdkClient  = require('./SdkClient')
 
 module.exports = class SdkChannel extends IpcChannel {
-  constructor (keypairManager) {
+  constructor () {
     super('sdk')
     this.explorer = new ExplorerChannel()
-    this.rpcServer = new RpcServer(EthersClient, { channel: this, keypairManager })
+    this.sdkclient = new SdkClient()
   }
 
-  setNetwork (option) {
-    this.rpcServer.setNetwork(option)
+  init({ initSDkData, initUserData }) {
+    this.sdkclient.initSDK(initSDkData)
+    this.sdkclient.initUserList(initUserData)
+    this.sdkclient.initMethods()
   }
 
-  unsetNetwork () {
-    this.rpcServer.unsetNetwork()
+  call(methodName, ...data) {
+    return this.sdkclient.invokeMethods(methodName, ...data)
   }
 }
 
 class ExplorerChannel extends IpcChannel {
-  constructor () {
+  constructor() {
     super('explorer')
-    this.baseUrl = `${process.env.SERVER_URL}/api/v1`
   }
 
-  async GET (networkId, query) {
-    if (networkId.startsWith('dev')) {
+  async GET(networkId, query) {
       return { result: [] }
-    }
-
-    const result = await this.fetch(`${this.baseUrl}/explorer/${networkId}`, query)
-    try {
-      return JSON.parse(result)
-    } catch {
-      return { result: [] }
-    }
   }
 }

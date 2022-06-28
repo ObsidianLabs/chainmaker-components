@@ -1,5 +1,5 @@
 {
-  "name": "@obsidians/eth-components",
+  "name": "@obsidians/chainmaker-components",
   "license": "GPL-3.0",
   "private": true,
   "engines": {
@@ -15,6 +15,7 @@
     "packages/*",
     "../eth-components/packages/*",
     "../electron-components/packages/*",
+    "../eth-components/packages/*",
     "../chainmaker-sdk"
   ],
   "devDependencies": {

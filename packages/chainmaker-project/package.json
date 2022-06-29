@@ -1,7 +1,7 @@
 {
-  "name": "@obsidians/chainmaker-header",
+  "name": "@obsidians/chainmaker-project",
   "version": "0.3.0",
-  "description": "Black IDE header",
+  "description": "Ethereum project",
   "author": "Phil <qft.gtr@gmail.com>",
   "license": "GPL-3.0",
   "source": "src/index.js",
@@ -17,15 +17,23 @@
     "prepare": "yarn build"
   },
   "dependencies": {
-    "@obsidians/auth": "^0.3.0",
+    "@obsidians/code-editor": "^0.3.0",
+    "@obsidians/docker": "^0.3.0",
+    "@obsidians/eth-contract": "^0.3.0",
     "@obsidians/chainmaker-network": "^0.3.0",
-    "@obsidians/chainmaker-project": "^0.3.0",
-    "@obsidians/keypair": "^0.3.0",
-    "@obsidians/redux": "^0.3.0",
+    "@obsidians/eth-queue": "^0.3.0",
+    "@obsidians/file-ops": "^0.3.0",
+    "@obsidians/filetree": "^0.3.0",
     "@obsidians/i18n": "^0.3.0",
+    "@obsidians/keypair": "^0.3.0",
+    "@obsidians/notification": "^0.3.0",
+    "@obsidians/platform": "^0.3.0",
+    "@obsidians/redux": "^0.3.0",
+    "@obsidians/terminal": "^0.3.0",
     "@obsidians/ui-components": "^0.3.0",
     "@obsidians/workspace": "^0.3.0",
-    "@obsidians/chainmaker-sdk": "^0.3.0"
+    "lodash": "^4.17.15",
+    "semver": "^7.3.2"
   },
   "devDependencies": {
     "@babel/core": "^7.7.5",
@@ -47,8 +55,15 @@
     "rollup-plugin-postcss": "^2.3.0"
   },
   "peerDependencies": {
+    "immutable": "*",
+    "moment": "*",
+    "monaco-ace-tokenizer": "*",
+    "monaco-editor": "*",
     "react": "*",
-    "react-dom": "*"
+    "react-dom": "*",
+    "react-highlight": "*",
+    "react-router-dom": "*",
+    "prettier": "*"
   },
   "eslintConfig": {
     "extends": "react-app"

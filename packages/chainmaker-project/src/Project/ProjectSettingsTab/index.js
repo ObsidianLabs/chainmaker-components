@@ -143,7 +143,7 @@ export default class ProjectSettingsTab extends AbstractProjectSettingsTab {
                 onSelected={truffle => this.onChange(`compilers.${process.env.COMPILER_VERSION_KEY}`)(truffle)}
               />
             } */}
-            {
+            {/* {
               !noSolc &&
               <DockerImageInputSelector
                 channel={compilerManager.solc}
@@ -151,17 +151,17 @@ export default class ProjectSettingsTab extends AbstractProjectSettingsTab {
                 bg='bg-black'
                 label='Solc version'
                 noManager
-                // extraOptions={!projectManager.remote && framework === 'truffle' && [{
-                //   id: 'default',
-                //   display: 'From truffle-config.js',
-                //   onClick: () => this.onChange('compilers.solc')('default'),
-                // }]}
+                  extraOptions={!projectManager.remote && framework === 'truffle' && [{
+                  id: 'default',
+                  display: 'From truffle-config.js',
+                  onClick: () => this.onChange('compilers.solc')('default'),
+                }]}
                 selected={projectSettings?.get('compilers.solc')}
                 onSelected={solc => this.onChange('compilers.solc')(solc)}
                 readOnly={readOnly}
               />
-            }
-            <FormGroup>
+            } */}
+            {/* <FormGroup>
               <Label>EVM {t('project.version')}</Label>
               <CustomInput
                 id='settings-evm-version'
@@ -195,7 +195,7 @@ export default class ProjectSettingsTab extends AbstractProjectSettingsTab {
                   this.onChange('compilers.optimizer')({ enabled: false })
                 }
               }}
-            />
+            /> */}
 
             <h4 className='mt-4'>Solidity</h4>
             <FormGroup className='actionConfirm__checkbox'>

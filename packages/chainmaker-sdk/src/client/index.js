@@ -34,6 +34,10 @@ export default class InvokeClient {
     return this.channel.invoke('call', methodName, ...data)
   }
 
+  async invokeClassCall(className, methodName, ...data) {
+    return await this.channel.invoke('callContract', className, methodName, ...data)
+  }
+
   async networkInfo() {
      const { block: { header } } = await this.invokeCall('getLastBlock', 'true')
 

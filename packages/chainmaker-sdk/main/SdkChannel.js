@@ -6,16 +6,29 @@ module.exports = class SdkChannel extends IpcChannel {
     super('sdk')
     this.explorer = new ExplorerChannel()
     this.sdkclient = new SdkClient()
+    this.classList = {}
   }
+
+  
 
   init({ initSDkData, initUserData }) {
     this.sdkclient.initSDK(initSDkData)
     this.sdkclient.initUserList(initUserData)
     this.sdkclient.initMethods()
+    console.log(this.sdkclient.sdkInstance.userContractMgr['createContractCreatePayload'])
   }
 
   call(methodName, ...data) {
     return this.sdkclient.invokeMethods(methodName, ...data)
+  }
+
+  async callContract (className, funcName, params){
+    if (params.userInfoList) {
+      params.userInfoList = await this.sdkclient.initUserListWithCurrentOrg(params.userInfoList)
+    }
+    let res =  await this.sdkclient.sdkInstance[className][funcName](params)
+    console.log(res)
+    return res
   }
 }
 

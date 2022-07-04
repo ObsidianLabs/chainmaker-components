@@ -28,7 +28,10 @@ module.exports = class SdkClient {
     this.nodeConfigArray = []
     this.userKeyPathFile = null
     this.userCrtPathFile= null
+    this.currentConfig = {}
   }
+
+
 
    saveToTemp({ userKeyString, userCertString }) {
     this.userKeyPathFile = path.join(os.tmpdir(), 'tempUser.key')
@@ -45,6 +48,11 @@ module.exports = class SdkClient {
   }
 
   initSDK({ chainId, orgId, userKeyString, userCertString, nodeConfigArray, timeout }) {
+    this.currentConfig = {
+      chainId,
+      orgId,
+      nodeConfigArray,
+    }
     if (!this.userCrtPathFile || !this.userKeyPathFile) {
       this.saveToTemp({ userKeyString, userCertString })
     }
@@ -56,6 +64,16 @@ module.exports = class SdkClient {
       getNodeConfig(nodeConfigArray[0]),
       3000
     )
+  }
+
+  updateSdkWithNewUser({userKeyString, userCertString}){
+    this.initSDK({ 
+      chainId: this.currentConfig.chainId, 
+      orgId: this.currentConfig.orgId, 
+      nodeConfigArray: this.currentConfig.nodeConfigArray, 
+      userKeyString, 
+      userCertString, 
+      })
   }
 
   initUserList({ orgId, userKeyString, userCertString }) {
@@ -70,12 +88,33 @@ module.exports = class SdkClient {
     this.userList.push(newUser)
   }
 
+  async initUserListWithCurrentOrg(users){
+    let userList =  []
+    for (let user of users){
+      this.saveToTemp({ userKeyString: user.signKey, userCertString: user.signCrt })
+      const newUser = new User(
+        this.currentConfig.orgId,
+        this.userKeyPathFile,
+        this.userCrtPathFile,
+      )
+      userList.push(newUser)
+    }
+    return userList
+  }
+
   initMethods() {
-    const callMethods = (sdk, methods) => (name, ...data) => methods[name](sdk, ...data)
+    const callMethods = (sdk, methods) => (name, ...data) => {
+      methods[name](sdk, ...data)
+    }
     this.callSdkMethods = callMethods(this.sdkInstance, methods)
+    this.callContractMethods = callMethods(this.sdkInstance.userContractMgr, methods)
   }
 
   invokeMethods(name, ...data) {
    return this.callSdkMethods(name, ...data)
+  }
+
+  invokeContractMethods(name, ...data) {
+   return this.callContractMethods(name, ...data)
   }
 }

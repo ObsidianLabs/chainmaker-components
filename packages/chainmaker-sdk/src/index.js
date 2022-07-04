@@ -77,6 +77,30 @@ const getFinalSDK = ({ kp, networks,  customNetworks = [], utils,  Client }) => 
       return ''
      }
 
+    async accountFrom(address) {
+      return {
+        codeHash: address
+      }
+    }
+
+    contractFrom({abi, address, contractName}){
+      return {
+        address: address,
+        contractName,
+        execute: async (actionName, parameters, {from, value}) => {
+          return await this.client.invokeClassCall('callUserContract', 'invokeUserContract', {
+            contractName,
+            method: actionName,
+            params: parameters.json,
+            withSyncResult: true,
+          })
+        }
+      }
+    }
+
+    txOptions
+
+
   }
 }
 

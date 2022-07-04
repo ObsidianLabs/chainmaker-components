@@ -8,7 +8,7 @@ import {
 import { KeypairInputSelector } from '@obsidians/keypair'
 import notification from '@obsidians/notification'
 
-import { networkManager } from '@obsidians/eth-network'
+import { networkManager } from '@obsidians/chainmaker-network'
 import { ActionParamFormGroup } from '@obsidians/eth-contract'
 
 export default class SignRequestModal extends PureComponent {

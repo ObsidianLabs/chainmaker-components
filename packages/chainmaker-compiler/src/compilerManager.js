@@ -322,16 +322,16 @@ export class CompilerManager {
     const { framework, npmClient, compilers } = settings
     const projectDir = fileOps.current.getDockerMountPath(projectRoot)
 
-    switch (framework) {
-      default: 
+    // switch (framework) {
+    //   default: 
 
-      break;
-    }
+    //   break;
+    // }
 
-    if (!framework.endsWith('-docker')) {
-      const npmRun = npmClient === 'yarn' ? npmClient : `${npmClient} run`
-      return `${npmRun} build`
-    }
+    // if (!framework.endsWith('-docker')) {
+    //   const npmRun = npmClient === 'yarn' ? npmClient : `${npmClient} run`
+    //   return `${npmRun} build`
+    // }
 
     // const cmd = [
     //   `docker run -d --name chainmaker-solidity-contract -v $WORK_DIR:/home chainmakerofficial/chainmaker-solidity-contract:2.0.0 bash -c "while true; do echo hello world; sleep 5;done"

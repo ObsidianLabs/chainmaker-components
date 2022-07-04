@@ -11,7 +11,7 @@ import {
 import notification from '@obsidians/notification'
 import { KeypairInputSelector } from '@obsidians/keypair'
 
-import { networkManager } from '@obsidians/network'
+import { networkManager } from '@obsidians/chainmaker-network'
 import { ContractForm, ActionParamFormGroup } from '@obsidians/eth-contract'
 import { t } from '@obsidians/i18n'
 
@@ -51,9 +51,7 @@ export default class DeployerButton extends PureComponent {
     this.setState({ selected: option.contracts[0].path, contracts: option.contracts })
 
     this.modal.current.openModal()
-    console.log(this.state)
     await this.updateContractFromPath(option.contracts[0])
-    console.log(this.state)
     // await this.updateAbi(contractFileNode)
     // const options = {}
     // networkManager.sdk?.txOptions?.list.forEach(opt => options[opt.name] = '')

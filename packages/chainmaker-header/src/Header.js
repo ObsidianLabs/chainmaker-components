@@ -1,9 +1,9 @@
 import React, { PureComponent } from 'react'
 import redux from '@obsidians/redux'
-import Navbar from '@obsidians/navbar'
+import Navbar from 'chainmaker-navbar'
 import keypairManager from '@obsidians/keypair'
 import { navbarItem } from '@obsidians/workspace'
-import { NewProjectModal } from '@obsidians/eth-project'
+import { NewProjectModal } from '@obsidians/chainmaker-project'
 import { networkManager } from '@obsidians/chainmaker-network'
 import { utils } from '@obsidians/sdk'
 import { t } from '@obsidians/i18n'
@@ -144,7 +144,8 @@ export default class Header extends PureComponent {
     } = this.props
 
     const username = profile.get('username') || projects.get('selected')?.toJS()?.author
-    const navbarLeft = [navbarItem(projects, selectedProject, username)]
+    const navbarLeft = [navbarItem(projects, selectedProject, 'local')]
+
     
     const contractIcon = isSelected => isSelected ? 'fas fa-file-invoice' : 'far fa-file'
     const addressIcon = isSelected => isSelected ? 'fas fa-map-marker-alt' : 'far fa-map-marker'

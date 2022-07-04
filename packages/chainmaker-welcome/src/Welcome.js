@@ -68,13 +68,13 @@ export default class Welcome extends PureComponent {
         link: `https://hub.docker.com/r/${process.env.DOCKER_IMAGE_NODE}`,
         downloadingTitle: `Downloading ${process.env.CHAIN_EXECUTABLE_NAME}`,
       },
-      {
-        channel: compiler.truffle,
-        title: `${process.env.COMPILER_NAME} in Docker`,
-        subtitle: props.truffleSubtitle,
-        link: `https://hub.docker.com/r/${process.env.DOCKER_IMAGE_COMPILER}`,
-        downloadingTitle: `Downloading ${process.env.COMPILER_NAME}`,
-      },
+      // {
+      //   channel: compiler.truffle,
+      //   title: `${process.env.COMPILER_NAME} in Docker`,
+      //   subtitle: props.truffleSubtitle,
+      //   link: `https://hub.docker.com/r/${process.env.DOCKER_IMAGE_COMPILER}`,
+      //   downloadingTitle: `Downloading ${process.env.COMPILER_NAME}`,
+      // },
       ...extraItems,
     ]
   }

@@ -5,6 +5,7 @@ import {
   FormGroup,
   Label,
   CustomInput,
+  Input,
 } from '@obsidians/ui-components'
 
 import {
@@ -20,6 +21,7 @@ import compilerManager from '@obsidians/compiler'
 
 import NewProjectModal from '../../components/NewProjectModal'
 import { t } from '@obsidians/i18n'
+import debounce from 'lodash/debounce'
 
 export default class ProjectSettingsTab extends AbstractProjectSettingsTab {
   static contextType = WorkspaceContext
@@ -31,6 +33,8 @@ export default class ProjectSettingsTab extends AbstractProjectSettingsTab {
   componentWillUnmount () {
     BaseProjectManager.channel.off('settings', this.debouncedUpdate)
   }
+
+  changeChecked = () => this.onChange('formatSolidity')(!this.context.projectSettings?.get('formatSolidity'))
 
   renderLanguageOption = projectSettings => {
     if (!this.props.languages?.length) {
@@ -56,10 +60,10 @@ export default class ProjectSettingsTab extends AbstractProjectSettingsTab {
   render () {
     const { noSolc } = this.props
     const { projectRoot, projectManager, projectSettings } = this.context
-    const framework = projectSettings?.get('framework')
+    // const framework = projectSettings?.get('framework')
     const readOnly = !projectManager.userOwnProject && projectManager.remote
-    const frameworks = Object.entries(NewProjectModal.defaultProps.FrameworkSelector.frameworkNames)
-      .map(([key, name]) => ({ key, name }))
+    // const frameworks = Object.entries(NewProjectModal.defaultProps.FrameworkSelector.frameworkNames)
+    //   .map(([key, name]) => ({ key, name }))
 
     return (
       <div className='custom-tab bg2'>
@@ -87,7 +91,7 @@ export default class ProjectSettingsTab extends AbstractProjectSettingsTab {
               placeholder={`Path to the built contract to deploy`}
               readOnly={readOnly}
             />
-            {
+            {/* {
               !projectManager.remote &&
               <FormGroup>
                 <Label>{t('framework')}</Label>
@@ -104,8 +108,8 @@ export default class ProjectSettingsTab extends AbstractProjectSettingsTab {
                   {frameworks.map(f => <option key={f.key} value={f.key}>{f.name}</option>)}
                 </CustomInput>
               </FormGroup>
-            }
-            {
+            } */}
+            {/* {
               !framework.endsWith('-docker') &&
               <FormGroup>
                 <Label>Npm {t('client')}</Label>
@@ -122,8 +126,8 @@ export default class ProjectSettingsTab extends AbstractProjectSettingsTab {
                   <option value='cnpm'>cnpm</option>
                 </CustomInput>
               </FormGroup>
-            }
-            <h4 className='mt-4'>{t('project.compilers')}</h4>
+            } */}
+            {/* <h4 className='mt-4'>{t('project.compilers')}</h4>
             {
               !projectManager.remote && framework === 'truffle' &&
               <DockerImageInputSelector
@@ -138,8 +142,8 @@ export default class ProjectSettingsTab extends AbstractProjectSettingsTab {
                 readOnly={readOnly}
                 onSelected={truffle => this.onChange(`compilers.${process.env.COMPILER_VERSION_KEY}`)(truffle)}
               />
-            }
-            {
+            } */}
+            {/* {
               !noSolc &&
               <DockerImageInputSelector
                 channel={compilerManager.solc}
@@ -147,7 +151,7 @@ export default class ProjectSettingsTab extends AbstractProjectSettingsTab {
                 bg='bg-black'
                 label='Solc version'
                 noManager
-                extraOptions={!projectManager.remote && framework === 'truffle' && [{
+                  extraOptions={!projectManager.remote && framework === 'truffle' && [{
                   id: 'default',
                   display: 'From truffle-config.js',
                   onClick: () => this.onChange('compilers.solc')('default'),
@@ -156,8 +160,8 @@ export default class ProjectSettingsTab extends AbstractProjectSettingsTab {
                 onSelected={solc => this.onChange('compilers.solc')(solc)}
                 readOnly={readOnly}
               />
-            }
-            <FormGroup>
+            } */}
+            {/* <FormGroup>
               <Label>EVM {t('project.version')}</Label>
               <CustomInput
                 id='settings-evm-version'
@@ -191,10 +195,20 @@ export default class ProjectSettingsTab extends AbstractProjectSettingsTab {
                   this.onChange('compilers.optimizer')({ enabled: false })
                 }
               }}
-            />
+            /> */}
 
-            <h4 className='mt-4'>Linter</h4>
+            <h4 className='mt-4'>Solidity</h4>
+            <FormGroup className='actionConfirm__checkbox'>
+              <div className='ml-4'>
+                <Input type='checkbox' id='format-solidity-check-box'
+                  disabled={readOnly}
+                  onChange={debounce(this.changeChecked, 200)}
+                  checked={projectSettings?.get('formatSolidity')} />
+                <Label check htmlFor='format-solidity-check-box'>{t('project.formatSolidity')}</Label>
+              </div>
+            </FormGroup>
             <FormGroup>
+              <Label>Linter</Label>
               <CustomInput
                 id='settings-linter'
                 type='select'

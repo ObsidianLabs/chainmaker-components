@@ -14,7 +14,7 @@ import notification from '@obsidians/notification'
 
 import { NewProjectModal } from '@obsidians/workspace'
 
-import FrameworkSelector from './FrameworkSelector'
+// import FrameworkSelector from './FrameworkSelector'
 import { t } from '@obsidians/i18n'
 
 const openZeppelinVersions = [
@@ -48,18 +48,31 @@ export default class ExtendedNewProjectModal extends NewProjectModal {
     this.framework = React.createRef()
   }
 
+
   componentDidUpdate () {
-    const { group, framework } = this.state
-    if (group === process.env.COMPILER_NAME && !framework.endsWith('-docker')) {
-      this.setState({ framework: `${process.env.COMPILER_EXECUTABLE_NAME}-docker` })
-    }
+    // const { group, framework } = this.state
+    // if (group === process.env.COMPILER_NAME && !framework.endsWith('-docker')) {
+    //   this.setState({ framework: `${process.env.COMPILER_EXECUTABLE_NAME}-docker` })
+    // }
   }
 
-  async createProject ({ projectRoot, name, template, group }) {
+  async createProject({ projectRoot, name, template, group }) {
     if (this.props.createProject) {
       const createProject = this.props.createProject.bind(this)
       return createProject({ projectRoot, name, template, group })
     }
+
+    try {
+      let result = await super.createProject({ projectRoot, name, template })
+      return {
+        projectRoot,
+        name
+      }
+    } catch (e) {
+      return false
+    }
+
+
 
     const {
       remote,
@@ -68,116 +81,116 @@ export default class ExtendedNewProjectModal extends NewProjectModal {
       openZeppelinVersion,
     } = this.state
 
-    if (remote) {
-      return super.createProject({ projectRoot, name, template, compilerVersion })
-    }
+    // if (remote) {
+    //   const result = super.createProject({ projectRoot, name, template, compilerVersion })
+    //   console.log('result', result)
+    //   return result
+    // }
 
-    const {
-      name: compilerName,
-      version: compilerVersion,
-    } = this.framework.current.getNameAndVersion(framework, remote)
+    // const {
+    //   name: compilerName,
+    //   version: compilerVersion,
+    // } = this.framework.current.getNameAndVersion(framework, remote)
 
-    if (!this.props.noCompilerOption && !compilerVersion) {
-      notification.error(t('project.cannotCreate'), t(('project.cannotCreateTextOne'),{ name: compilerName}))
-      return false
-    }
+    // if (!this.props.noCompilerOption && !compilerVersion) {
+    //   notification.error(t('project.cannotCreate'), t(('project.cannotCreateTextOne'),{ name: compilerName}))
+    //   return false
+    // }
 
-    if (group === process.env.COMPILER_NAME) {
-      this.setState({ showTerminal: true })
-      if (!compilerVersion) {
-        notification.error(t('project.cannotCreate'), t(('project.cannotCreateTextOne'),{ name: process.env.COMPILER_NAME}))
-        return false
-      }
-      await fileOps.current.ensureDirectory(projectRoot)
-      const projectDir = fileOps.current.getDockerMountPath(projectRoot)
-      const cmd = [
-        `docker run --rm -it`,
-        `--name ${process.env.PROJECT}-create-project`,
-        `-v "${projectDir}:/project/${name}"`,
-        `-w "/project/${name}"`,
-        `${process.env.DOCKER_IMAGE_COMPILER}:${compilerVersion}`,
-        `${process.env.COMPILER_EXECUTABLE_NAME} unbox ${template}`,
-      ].join(' ')
+    // if (group === process.env.COMPILER_NAME) {
+    //   this.setState({ showTerminal: true })
+    //   if (!compilerVersion) {
+    //     notification.error(t('project.cannotCreate'), t(('project.cannotCreateTextOne'),{ name: process.env.COMPILER_NAME}))
+    //     return false
+    //   }
+    //   await fileOps.current.ensureDirectory(projectRoot)
+    //   const projectDir = fileOps.current.getDockerMountPath(projectRoot)
+    //   const cmd = [
+    //     `docker run --rm -it`,
+    //     `--name ${process.env.PROJECT}-create-project`,
+    //     `-v "${projectDir}:/project/${name}"`,
+    //     `-w "/project/${name}"`,
+    //     `${process.env.DOCKER_IMAGE_COMPILER}:${compilerVersion}`,
+    //     `${process.env.COMPILER_EXECUTABLE_NAME} unbox ${template}`,
+    //   ].join(' ')
 
-      const result = await this.terminal.current.exec(cmd)
-      if (result.code) {
-        notification.error(t('project.cannotCreate'))
-        return false
-      }
+    //   const result = await this.terminal.current.exec(cmd)
+    //   if (result.code) {
+    //     notification.error(t('project.cannotCreate'))
+    //     return false
+    //   }
 
-      const config = {
-        main: './contracts/MetaCoin.sol',
-        deploy: './build/contracts/MetaCoin.json',
-        framework: `${process.env.COMPILER_EXECUTABLE_NAME}-docker`,
-        npmClient,
-        compilers: {
-          [process.env.COMPILER_VERSION_KEY]: compilerVersion,
-          solc: 'default'
-        }
-      }
-      await fileOps.current.writeFile(fileOps.current.path.join(projectRoot, 'config.json'), JSON.stringify(config, null, 2))
-      return { projectRoot, name }
-    }
+    //   const config = {
+    //     main: './contracts/Main.sol',
+    //     deploy: './build/contracts/main.json',
+    //     // framework: `${process.env.COMPILER_EXECUTABLE_NAME}-docker`,
+    //     // npmClient,
+    //     // compilers: {
+    //     //   [process.env.COMPILER_VERSION_KEY]: compilerVersion,
+    //     //   solc: 'default'
+    //     // }
+    //   }
+    //   await fileOps.current.writeFile(fileOps.current.path.join(projectRoot, 'config.json'), JSON.stringify(config, null, 2))
+    //   return { projectRoot, name }
+    // }
 
-    let openZeppelinPackage
-    if (group === 'open zeppelin') {
-      openZeppelinPackage = `@openzeppelin/contracts`
-      if (template === 'openzeppelin') {
-        const hasERC1155 = semver.gte(openZeppelinVersion, 'v3.1.0')
-        if (!hasERC1155) {
-          template = 'openzeppelin-no-erc1155'
-        }
-        if (semver.lt(openZeppelinVersion, '3.0.0')) {
-          openZeppelinPackage = 'openzeppelin-solidity'
-          template = 'openzeppelin-v2'
-        } else if (semver.gte(openZeppelinVersion, '4.0.0')) {
-          template = 'openzeppelin-v4'
-        }
-      }
-    }
+    // let openZeppelinPackage
+    // if (group === 'open zeppelin') {
+    //   openZeppelinPackage = `@openzeppelin/contracts`
+    //   if (template === 'openzeppelin') {
+    //     const hasERC1155 = semver.gte(openZeppelinVersion, 'v3.1.0')
+    //     if (!hasERC1155) {
+    //       template = 'openzeppelin-no-erc1155'
+    //     }
+    //     if (semver.lt(openZeppelinVersion, '3.0.0')) {
+    //       openZeppelinPackage = 'openzeppelin-solidity'
+    //       template = 'openzeppelin-v2'
+    //     } else if (semver.gte(openZeppelinVersion, '4.0.0')) {
+    //       template = 'openzeppelin-v4'
+    //     }
+    //   }
+    // }
 
-    let result = await super.createProject({ projectRoot, name, template, framework, npmClient, compilerVersion, notify: false })
-    if (!result) {
-      return false
-    }
+    // if (!result) {
+    //   return false
+    // }
 
-    if (group === 'open zeppelin' || !framework.endsWith('-docker')) {
-      this.setState({ showTerminal: true })
-      const result = await this.terminal.current.exec(`${npmClient} init -y`, { cwd: projectRoot })
-      if (result.code) {
-        notification.error(t('project.cannotCreate'), t('project.cannotCreateTextTwo'))
-        return false
-      }
-    }
+    // if (group === 'open zeppelin' || !framework.endsWith('-docker')) {
+    //   this.setState({ showTerminal: true })
+    //   const result = await this.terminal.current.exec(`${npmClient} init -y`, { cwd: projectRoot })
+    //   if (result.code) {
+    //     notification.error(t('project.cannotCreate'), t('project.cannotCreateTextTwo'))
+    //     return false
+    //   }
+    // }
 
-    const installCommand = npmClient === 'yarn' ? 'add --dev' : 'i -D'
-    if (group === 'open zeppelin') {
-      const result = await this.terminal.current.exec(`${npmClient} ${installCommand} ${openZeppelinPackage}@${openZeppelinVersion}`, { cwd: projectRoot })
-      if (result.code) {
-        notification.error(t('project.fail'))
-        return false
-      }
-    }
+    // const installCommand = npmClient === 'yarn' ? 'add --dev' : 'i -D'
+    // if (group === 'open zeppelin') {
+    //   const result = await this.terminal.current.exec(`${npmClient} ${installCommand} ${openZeppelinPackage}@${openZeppelinVersion}`, { cwd: projectRoot })
+    //   if (result.code) {
+    //     notification.error(t('project.fail'))
+    //     return false
+    //   }
+    // }
 
-    if (!await this.framework.current.installDependencies({
-      framework,
-      npmClient,
-      installCommand,
-      compilerVersion,
-      projectRoot,
-      terminal: this.terminal.current,
-    })) {
-      return false
-    }
-    
+    // if (!await this.framework.current.installDependencies({
+    //   framework,
+    //   npmClient,
+    //   installCommand,
+    //   compilerVersion,
+    //   projectRoot,
+    //   terminal: this.terminal.current,
+    // })) {
+    //   return false
+    // }
 
-    if (!framework.endsWith('-docker')) {
-      result = await super.createProject({ projectRoot, name, template, framework }, 'post')
-      if (!result) {
-        return false
-      }
-    }
-    return { projectRoot, name }
+    // if (!framework.endsWith('-docker')) {
+    //   result = await super.createProject({ projectRoot, name, template, framework }, 'post')
+    //   if (!result) {
+    //     return false
+    //   }
+    // }
+    // return { projectRoot, name }
   }
 
   renderTemplate (renderSuper) {
@@ -212,13 +225,13 @@ export default class ExtendedNewProjectModal extends NewProjectModal {
           </div>
           }
         </div>
-        <FrameworkSelector
+        {/* <FrameworkSelector
           ref={this.framework}
           framework={framework}
           group={group}
           onSelectFramework={framework => this.setState({ framework })}
-        />
-        {
+        /> */}
+        {/* {
             (group === 'open zeppelin' || !framework.endsWith('-docker')) &&
             <FormGroup>
               <Label>Npm {t('client')}</Label>
@@ -236,37 +249,36 @@ export default class ExtendedNewProjectModal extends NewProjectModal {
                 />
               </div>
             </FormGroup>
-          }
+          } */}
       </>
     )
   }
 }
 
 const templates = [
-  { id: 'empty', display: 'Empty Project' },
-  { id: 'coin', display: 'Coin' },
+  // { id: 'empty', display: 'Empty Project' },
+  // { id: 'coin', display: 'Coin' },
   { id: 'erc20', display: 'ERC20 Token' },
-  {
-    group: 'open zeppelin',
-    badge: 'Open Zeppelin',
-    local: true,
-    children: [
-      { id: 'openzeppelin', display: 'Basics - ERC20, ERC721 & ERC1155 (v3.1+)' },
-    ],
-  },
-  {
-    group: `${process.env.COMPILER_NAME}`,
-    badge: `${process.env.COMPILER_NAME}`,
-    local: true,
-    children: [
-      { id: 'metacoin', display: 'Metacoin' },
-    ],
-  }
+  { id: 'empty', display: 'Empty'}
+  // {
+  //   group: 'open zeppelin',
+  //   badge: 'Open Zeppelin',
+  //   local: true,
+  //   children: [
+  //     { id: 'openzeppelin', display: 'Basics - ERC20, ERC721 & ERC1155 (v3.1+)' },
+  //   ],
+  // },
+  // {
+  //   group: `${process.env.COMPILER_NAME}`,
+  //   badge: `${process.env.COMPILER_NAME}`,
+  //   local: true,
+  //   children: [
+  //     { id: 'metacoin', display: 'Metacoin' },
+  //   ],
+  // }
 ]
 
 ExtendedNewProjectModal.defaultProps = {
-  defaultTemplate: 'coin',
-  defaultFramework: 'truffle',
-  templates,
-  FrameworkSelector,
+  defaultTemplate: 'erc20',
+  templates
 }

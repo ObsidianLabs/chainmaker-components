@@ -39,9 +39,9 @@ export default function NetworkStatus(props) {
         <DropdownItem header>
           <i className='fas fa-hammer mr-1' /> {t('network.network.tools')}
         </DropdownItem>
-        <DropdownItem onClick={() => rpcModal.current?.openModal()}>
+        {/* <DropdownItem onClick={() => rpcModal.current?.openModal()}>
           {t('rpc.client')}
-        </DropdownItem>
+        </DropdownItem> */}
         {
           (networkId !== 'dev' && networkId !== 'custom' && network) && <DropdownItem onClick={handleRefreshNetwork}>
             {connected ? t('network.network.disconnect') : t('network.network.reconnect')}

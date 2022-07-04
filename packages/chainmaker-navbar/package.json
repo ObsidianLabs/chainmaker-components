@@ -1,7 +1,7 @@
 {
-  "name": "@obsidians/chainmaker-header",
+  "name": "chainmaker-navbar",
   "version": "0.3.0",
-  "description": "Black IDE header",
+  "description": "Navbar",
   "author": "Phil <qft.gtr@gmail.com>",
   "license": "GPL-3.0",
   "source": "src/index.js",
@@ -18,14 +18,12 @@
   },
   "dependencies": {
     "@obsidians/auth": "^0.3.0",
-    "@obsidians/chainmaker-network": "^0.3.0",
-    "@obsidians/chainmaker-project": "^0.3.0",
-    "@obsidians/keypair": "^0.3.0",
-    "@obsidians/redux": "^0.3.0",
+    "@obsidians/file-ops": "^0.3.0",
     "@obsidians/i18n": "^0.3.0",
+    "@obsidians/platform": "^0.3.0",
     "@obsidians/ui-components": "^0.3.0",
-    "@obsidians/workspace": "^0.3.0",
-    "@obsidians/chainmaker-sdk": "^0.3.0"
+    "react-contexify": "^5.0.0",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@babel/core": "^7.7.5",
@@ -47,8 +45,10 @@
     "rollup-plugin-postcss": "^2.3.0"
   },
   "peerDependencies": {
-    "react": "*",
-    "react-dom": "*"
+    "react": "^17.0.0",
+    "react-dom": "^17.0.0",
+    "react-router": "^5.2.0",
+    "react-router-dom": "^5.2.0"
   },
   "eslintConfig": {
     "extends": "react-app"

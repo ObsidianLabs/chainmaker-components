@@ -12,8 +12,8 @@ export default class ExtendedProjectSettings extends ProjectSettings {
     const settings = {
       main: rawSettings.main || './contracts/Contract.sol',
       deploy: rawSettings.deploy,
-      framework: rawSettings.framework || `${process.env.COMPILER_VERSION_KEY}-docker`,
-      npmClient: rawSettings.npmClient,
+      // framework: rawSettings.framework || `${process.env.COMPILER_VERSION_KEY}-docker`,
+      // npmClient: rawSettings.npmClient,
       compilers: {
         ...compilers,
         [process.env.COMPILER_VERSION_KEY]: compilers[process.env.COMPILER_VERSION_KEY] || '',
@@ -26,7 +26,8 @@ export default class ExtendedProjectSettings extends ProjectSettings {
         fontFamily: rawSettings.editor?.fontFamily || 'Hack',
         fontSize: rawSettings.editor?.fontSize || '13px',
         ligatures: Boolean(rawSettings.editor?.ligatures),
-      }
+      },
+      formatSolidity: rawSettings.formatSolidity || false
     }
     if (rawSettings.language) {
       settings.language = rawSettings.language

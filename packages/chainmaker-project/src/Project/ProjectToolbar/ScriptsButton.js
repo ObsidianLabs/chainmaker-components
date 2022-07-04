@@ -10,10 +10,10 @@ export default function ScriptsButton({ projectManager, readOnly }) {
   const [isNodeProject, setNodeProject] = React.useState(false)
   const [options, setOptions] = React.useState([])
 
-  React.useEffect(BaseProjectManager.effect(`settings:framework`, framework => {
-    const isNodeProject = !framework.endsWith('-docker')
-    setNodeProject(isNodeProject)
-  }), [])
+  // React.useEffect(BaseProjectManager.effect(`settings:framework`, framework => {
+  //   const isNodeProject = !framework.endsWith('-docker')
+  //   setNodeProject(isNodeProject)
+  // }), [])
 
   React.useEffect(() => {
     if (!isNodeProject) {

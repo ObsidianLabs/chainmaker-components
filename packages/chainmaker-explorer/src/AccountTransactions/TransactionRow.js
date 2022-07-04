@@ -22,10 +22,7 @@ export default class TransactionRow extends PureComponent {
           <Address addr={txDetail.sender.signer.orgId} redirect={false} />
         </td>
         <td>
-          <Address
-            addr={txDetail.payload.contractName}
-            showTooltip={false}
-            redirect={false}/>
+          {txDetail.payload.contractName}
         </td>
         <td>
           <small>{moment(txDetail.payload.timestamp * 1000).format('MM/DD HH:mm:ss')}</small>

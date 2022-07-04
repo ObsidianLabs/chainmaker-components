@@ -64,6 +64,7 @@ module.exports = class SdkClient {
       getNodeConfig(nodeConfigArray[0]),
       3000
     )
+    console.log('sdk_________', this.sdkInstance)
   }
 
   updateSdkWithNewUser({userKeyString, userCertString}){
@@ -115,6 +116,15 @@ module.exports = class SdkClient {
   }
 
   invokeContractMethods(name, ...data) {
-   return this.callContractMethods(name, ...data)
+    return this.callContractMethods(name, ...data)
+  }
+  
+  dispose() {
+    this.sdkInstance = null
+    this.sdkMethods = null
+    this.userList = []
+    this.nodeConfigArray = []
+    this.userKeyPathFile = null
+    this.userCrtPathFile = null
   }
 }

@@ -15,14 +15,6 @@ class NetworkManager {
     this.Sdks = new Map()
   }
 
-  addSdk(Sdk, networks) {
-    networks.forEach(n => this.Sdks.set(n.id, Sdk))
-
-    this.networks = [...this.networks, ...networks]
-
-    const enabled = !process.env.REACT_APP_DISABLE_BROWSER_EXTENSION
-  }
-
   get networkId() {
     return this.network?.id
   }
@@ -43,6 +35,12 @@ class NetworkManager {
     return this.current?.symbol
   }
 
+  addSdk(Sdk, networks) {
+    networks.forEach(n => this.Sdks.set(n.id, Sdk))
+    this.networks = [...this.networks, ...networks]
+    const enabled = !process.env.REACT_APP_DISABLE_BROWSER_EXTENSION
+  }
+
   addNetworks(networks) {
     networks.forEach(n => this.Sdks.set(n.id, this.Sdks.get(n.id)))
     this.networks = networks
@@ -57,25 +55,86 @@ class NetworkManager {
     this.Sdks.delete(networkId)
   }
 
-  async getUserKeyFilePath() {
+  async getUserKeyFilePath(address) {
     const allKeys = await keypairManager.loadAllKeypairs()
-    if(!allKeys.length) return null
-    const readKeys = await keypairManager.getSecret(allKeys[0].address)
+    if (!allKeys.length) return null
+    const targetAdress = address ?
+      allKeys.find(item => item.address === address).address
+      : allKeys[0].address
+ 
+    const readKeys = await keypairManager.getSecret(targetAdress)
     return JSON.parse(readKeys)
-
   }
 
-  async newSdk(params) {
-    const networkId = params.id.split('.')[0]
-    const Sdk = this.Sdks.get(networkId)
-    const userKeys = await this.getUserKeyFilePath()
+  getCustomNetParams(oldParam) {
+    const { name, chainId, orgId, ipAdress, pem, tlsEnable, hostName, user } = oldParam
+    return {
+      id: name,
+      preset: false,
+      name: name,
+      fullName: name,
+      icon: 'fas fa-globe',
+      chainId: chainId,
+      orgId: orgId,
+      url: ipAdress,
+      nodeConfigArray: [
+        {
+          nodeAddr: ipAdress,
+          tlsEnable: tlsEnable,
+          options: {
+            pem: pem,
+            clientKey: '',
+            clientCert: '',
+            hostName: hostName
+          },
+        }
+      ],
+      userKeyString: '',
+      userCertString: '',
+      user: user
+    }
+  }
 
+  async updateCustomNetwork({ url, name, option = {}, notify = true }) {
+    const info = await this.createSdk(option, true)
+
+
+    if (info && notify) {
+      redux.dispatch('SELECT_NETWORK', option.name)
+      redux.dispatch('CHANGE_NETWORK_STATUS', true)
+      redux.dispatch('ADD_CUSTOM_NETWORK', option)
+      notification.success(t('network.network.connected'), `${t('network.network.connectedTo')} <b>${name || url}</b>`)
+    }
+
+    return info
+  }
+
+  async createSdk(params, isCustom = false) {
+    const sdk = await this.newSdk(params, isCustom)
+    try {
+      const info = await sdk.networkInfo()
+      this._sdk = sdk
+      return info
+    } catch (e) {
+      console.warn(e)
+      notification.error('Invalid Parameters', '')
+      return false
+    }
+  }
+
+
+  async newSdk(params, isCustom = false) {
+    const networkId = isCustom ? 'custom' : params.id.split('.')[0]
+    const Sdk = this.Sdks.get(networkId)
+    const userKeys = await this.getUserKeyFilePath(params.preset ? null : params.user)
+    const { nodeConfigArray } = params
     if (!userKeys) {
       notification.error('No Available Keypiar', 'Please create or import a keypair in the keypair manager first.')
       return null
     }
     if (!Sdk) return null
-    const { nodeConfigArray } = params
+   
+
     params.nodeConfigArray[0].options = {
       ...nodeConfigArray[0].options,
       clientKey: userKeys.tlsKey,
@@ -83,7 +142,7 @@ class NetworkManager {
     }
     params.userCertString = userKeys.signCrt
     params.userKeyString = userKeys.signKey
-
+    
     return new Sdk(params)
   }
 
@@ -122,13 +181,9 @@ class NetworkManager {
   }
 
   async setNetwork(network, { force, redirect = true, notify = true } = {}) {
-
     redux.dispatch('ACTIVE_CUSTOM_NETWORK', network)
-
-    if (!network || network.id === redux.getState().network) {
-      return
-    }
-
+    if (!network || network.id === redux.getState().network) return
+  
     const cachingKeys = getCachingKeys()
     cachingKeys.filter(key => key.startsWith('contract-') || key.startsWith('account-')).forEach(dropByCacheKey)
 
@@ -153,40 +208,6 @@ class NetworkManager {
     }
     if (redirect) {
       headerActions.updateNetwork(network.id)
-    }
-  }
-
-  async updateCustomNetwork({ url, option = '{}', notify = true, name }) {
-    try {
-      if (option) {
-        option = JSON.parse(option)
-      }
-    } catch {
-      notification.error('Invalid Option', '')
-      return
-    }
-    const info = await this.createSdk({ id: 'custom', url, option })
-
-    if (info && notify) {
-      redux.dispatch('SELECT_NETWORK', `custom`)
-      redux.dispatch('CHANGE_NETWORK_STATUS', true)
-      notification.success(t('network.network.connected'), `${t('network.network.connectedTo')} <b>${name || url}</b>`)
-      
-    }
-
-    return info
-  }
-
-  async createSdk(params) {
-    const sdk = await this.newSdk(params)
-  
-    try {
-      const info = await sdk.networkInfo()
-      if (params.id !== 'custom') this._sdk = sdk
-      return info
-    } catch (e) {
-      console.warn(e)
-      notification.error('Invalid Node URL', '')
     }
   }
 }

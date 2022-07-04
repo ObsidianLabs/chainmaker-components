@@ -45,6 +45,7 @@ export default class CustomNetworkModal extends PureComponent {
     this.deleteModal.current.closeModal()
     const customNetworkMap = redux.getState().customNetworks.toJS()
 
+
     if (redux.getState().networkConnect && customNetworkMap[currentNetwork].active) {
       this.modal.current.closeModal()
       networkManager.setNetwork(networkManager.networks[0], {
@@ -56,29 +57,48 @@ export default class CustomNetworkModal extends PureComponent {
     redux.dispatch('REMOVE_CUSTOM_NETWORK', currentNetwork)
   }
 
-  connect = async option => {
-    try {
-      this.setState({ connecting: option.name })
-      const status = await networkManager.updateCustomNetwork({...option, notify: false})
-      if (status) {
-        redux.dispatch('CHANGE_NETWORK_STATUS', true)
-        this.modal.current?.closeModal()
-        this.setState({ connecting: '' })
-        headerActions.updateNetwork(option.name)
-        const connectCustomeNetwork = networkManager.networks?.find(item => item.id == option.name)
-        networkManager.setNetwork(connectCustomeNetwork)
-        return
-      }
-    } catch { }
-    notification.error(t('network.custom.err'), t('network.custom.errText'))
-    this.setState({ connecting: '' })
+  connect = async (option, keepConnect) => {
+    if (keepConnect) {
+      networkManager.setNetwork(option)
+      this.modal.current?.closeModal()
+      return
+    }
+    redux.dispatch('ACTIVE_CUSTOM_NETWORK', '')
+    redux.dispatch('CHANGE_NETWORK_STATUS', false)
+    redux.dispatch('SELECT_NETWORK', '')
+    notification.error(t('network.network.network'), t('network.network.networkDisconnect'))
+
+    // console.log('option', option)
+    // console.log('keepConnect', keepConnect)
+    // try {
+    //   this.setState({ connecting: option.name })
+    // const newOption = networkManager.getCustomNetParams(option)
+    // console.log('end', newOption)
+    //   const status = await networkManager.updateCustomNetwork({
+    //     url: newOption.url,
+    //     name: newOption.name,
+    //     option: newOption,
+    //     notify: true
+    //   })
+    //   console.log('connect', status)
+    //   if (status) {
+    //     this.setState({ connecting: newOption.name })
+        // redux.dispatch('SELECT_NETWORK', network.id)
+        // const connectCustomeNetwork = networkManager.networks?.find(item => item.id == option.name)
+        // networkManager.setNetwork(connectCustomeNetwork)
+    //     this.modal.current?.closeModal()
+    //     return
+    //   }
+    // } catch (e) { 
+    //   notification.error(t('network.custom.err'), t('network.custom.errText'))
+    //   this.setState({ connecting: '' })
+    // }
   }
 
   renderTableBody = () => {
-    const connecting = this.state.connecting
+    const { connecting } = this.state
     const customNetworks = this.props.customNetworks.toArray()
     customNetworks.sort((a, b) => a[0].localeCompare(b[0]))
-
     if (customNetworks.length) {
       return customNetworks.map(([name, item], i) => {
         return (
@@ -96,17 +116,16 @@ export default class CustomNetworkModal extends PureComponent {
                 </UncontrolledTooltip>
               }
             </td>
-            <td className='text-overflow-dots'>{item.get('url')}</td>
+            <td className='text-overflow-dots'>{item.get('nodeConfigArray')[0].options.hostName}</td>
             <td align='right'>
               <div className='d-flex align-items-center justify-content-between'>
                 <Button
-                  key={connecting === name ? `${name}-connecting` : `${name}-connect`}
+                  key={item.get('active') ?`${name}-connecting` : `${name}-connect`}
                   size='sm'
                   color='success'
-                  onClick={() => this.connect(item.toJS())}
-                >
+                  onClick={() => this.connect(item.toJS(), !item.get('active'))}>
                   {
-                    connecting === name ? <><i className='fas fa-spin fa-spinner mr-1'/>{t('network.custom.connecting')}</> : (t('network.custom.connect'))
+                    item.get('active') ? <><i className='fas fa-spin fa-spinner mr-1'/>{t('network.custom.connecting')}</> : (t('network.custom.connect'))
                   }
                 </Button>
                 {
@@ -155,8 +174,8 @@ export default class CustomNetworkModal extends PureComponent {
           tableSm
           TableHead={(
             <tr>
-              <th style={{ width: '20%' }}>name</th>
-              <th style={{ width: '55%' }}>IP adress</th>
+              <th style={{ width: '25%' }}>name</th>
+              <th style={{ width: '40%' }}>Host Name</th>
               <th></th>
             </tr>
           )}

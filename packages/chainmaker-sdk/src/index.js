@@ -26,7 +26,9 @@ const getFinalSDK = ({ kp, networks,  customNetworks = [], utils,  Client }) => 
 
     get utils() { return utils }
 
-    dispose() { this.client.dispose() }
+    dispose() {
+      this.client.dispose()
+    }
 
     isValidAddress(address) { 
 

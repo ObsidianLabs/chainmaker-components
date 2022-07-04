@@ -178,7 +178,7 @@ export default class Header extends PureComponent {
       icon: 'fas fa-map-marker-alt',
       noneIcon: 'fas fa-map-marker-times',
       selected: { id: selectedAccount, name: accountName },
-      dropdown: [...dropdownKeypairs, ...dropdownBrowserAccounts, ...dropdownStarred],
+      dropdown: [...dropdownStarred],
       onClickItem: selected => headerActions.selectAccount(network.id, selected),
       contextMenu: address => {
         if (starred.indexOf(address) === -1) {
@@ -202,14 +202,18 @@ export default class Header extends PureComponent {
       selected: networkReplaceName,
       dropdown: networkList,
       onClickItem: (_, network) => {
-        if (network.id === 'custom') redux.dispatch('CUSTOM_MODAL_STATUS', true)
-        if (network.id !== 'custom') networkManager.setNetwork(network)
+        if (network.name === 'Custom') {
+          redux.dispatch('CUSTOM_MODAL_STATUS', true)
+          return
+        }
+        networkManager.setNetwork(network)
       },
     }
 
     const navbarRight = noExplorer
       ? [contractNavbarItem, networkNavbarItem]
       : [contractNavbarItem, explorerNavbarItem, networkNavbarItem]
+    
 
     return (
       <>

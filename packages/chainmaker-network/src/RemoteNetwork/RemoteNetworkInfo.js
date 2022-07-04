@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, useLayoutEffect } from 'react'
 
 import {
   TableCard,

@@ -1,8 +1,6 @@
 import React, { PureComponent } from 'react'
 
-import {
-  IconButton,
-} from '@obsidians/ui-components'
+import { IconButton } from '@obsidians/ui-components'
 
 import RemoteNetwork from '../RemoteNetwork'
 
@@ -31,6 +29,7 @@ export default class CustomNetwork extends PureComponent {
     return <>
       <RemoteNetwork
         networkId={networkId}
+        isCustom={true}
         {...option}
         EditButton={
           <IconButton

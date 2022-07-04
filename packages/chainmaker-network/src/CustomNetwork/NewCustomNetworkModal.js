@@ -11,6 +11,7 @@ import notification from '@obsidians/notification'
 import { Input } from 'reactstrap'
 import networkManager from '../networkManager'
 import { t } from '@obsidians/i18n'
+import { KeypairInputSelector } from '@obsidians/keypair'
 
 export default class CustomNetworkModal extends PureComponent {
   constructor(props) {
@@ -20,95 +21,113 @@ export default class CustomNetworkModal extends PureComponent {
       status: null,
       modify: false,
       option: { tlsEnable: false },
-      originalOption: {},
+      originalOption: {}
     }
     this.modal = React.createRef()
     this.input = React.createRef()
   }
 
   openModal = (modify = false, newOption = {}) => {
-    this.name = newOption.hostName
-    this.setState({
-      pending: false,
-      status: null,
-      modify,
-      option: { ...this.setState.option, ...newOption },
-      originalOption: newOption
-    })
+    if (Object.keys(newOption).length) {
+      this.name = newOption.name
+      const { orgId, chainId, nodeConfigArray, name } = newOption
+      const { nodeAddr, tlsEnable, options: { hostName, pem } } = nodeConfigArray[0]
+      this.setState({
+        pending: false,
+        status: null,
+        modify,
+        option: {
+          hostName: hostName,
+          orgId: orgId,
+          chainId: chainId,
+          ipAdress: nodeAddr,
+          pem: pem,
+          name: name,
+          tlsEnable: tlsEnable
+        },
+        originalOption: newOption
+      })
+    } else {
+      this.setState({
+        pending: false,
+        status: null,
+        modify,
+        option: { tlsEnable: false },
+        originalOption: {}
+      })
+    }
+
     this.modal.current?.openModal()
     setTimeout(() => this.input.current?.focus(), 50)
   }
 
   tryCreateSdk = async option => {
-
+    const newOption = networkManager.getCustomNetParams(option)
     this.setState({ pending: true })
-    try {
-      const status = await networkManager.updateCustomNetwork(option)
-      console.log('tryCreateSdk', status)
-      if (status) {
-        this.setState({ pending: false, status })
-        return
-      }
-    } catch (error) {
-      notification.error(t('network.custom.err'), t('network.custom.errText'))
-      this.setState({ pending: false })
+    const networkInfo = await networkManager.updateCustomNetwork({
+      url: newOption.url,
+      name: newOption.name,
+      option: newOption,
+    })
+    if (!!networkInfo) {
+      this.setState({ pending: false, status: true })
+      return
     }
+    this.setState({ pending: false })
   }
 
   onConfirm = async () => {
     const { modify, status, option, originalOption } = this.state
     const customNetworkMap = redux.getState().customNetworks.toJS()
+
     const customNetworkNames = Object.keys(customNetworkMap);
     const connected = customNetworkMap[option.name]?.active;
-
+  
     if (customNetworkNames.includes(option.name) && !modify) {
       notification.error(t('network.custom.invalidName'), t('network.custom.invalidNameText', { name: option.name }))
       return
-    } else {
-      if (!status) {
-        this.tryCreateSdk({ ...option, notify: false })
-      } else {
-        if (modify) {
-          redux.dispatch('MODIFY_CUSTOM_NETWORK', { name: this.name, option })
-          if (option.url.trim() !== originalOption.url && connected) {
-            this.connect(option)
-          }
-        } else {
-          redux.dispatch('ADD_CUSTOM_NETWORK', option)
-        }
-        const customeNetworkMap = redux.getState().customNetworks.toJS()
-        const customeNetworkGroup = Object.keys(customeNetworkMap).map(name => ({
-          group: 'others',
-          icon: 'fas fa-vial',
-          id: name,
-          networkId: name,
-          name: name,
-          fullName: name,
-          notification: `${t('network.network.switchedTo')} <b>${name}</b>.`,
-          url: customeNetworkMap[name].url,
-        })).sort((a, b) => a.name.localeCompare(b.name))
-        const newNetworks = networkManager.networks.filter(item => item.group !== 'others' || item.id === 'others').concat([{
-          fullName: 'Custom Network',
-          group: 'others',
-          icon: 'fas fa-vial',
-          id: 'custom',
-          name: 'Custom',
-          notification: `${t('network.network.switchedTo')} <b>Custom</b> ${t('network.network.networkLow')}.`,
-          symbol: 'ETH',
-          url: '',
-        }]).concat(customeNetworkGroup)
-        networkManager.addNetworks(newNetworks)
-
-        this.setState({ pending: false, status: null })
-        this.modal.current.closeModal()
-      }
     }
+
+    if (!status) {
+      this.tryCreateSdk({ ...option, notify: false })
+      this.modal.current?.closeModal()
+    } else {
+      if (modify) {
+        redux.dispatch('MODIFY_CUSTOM_NETWORK', { name: this.name, option })
+      } else {
+        redux.dispatch('ADD_CUSTOM_NETWORK', option)
+      }
+        // const customeNetworkMap = redux.getState().customNetworks.toJS()
+        // const customeNetworkGroup = Object.keys(customeNetworkMap).map(name => ({
+        //   group: 'others',
+        //   icon: 'fas fa-vial',
+        //   id: name,
+        //   networkId: name,
+        //   name: name,
+        //   fullName: name,
+        //   notification: `${t('network.network.switchedTo')} <b>${name}</b>.`,
+        //   url: customeNetworkMap[name].url,
+        // })).sort((a, b) => a.name.localeCompare(b.name))
+        // const newNetworks = networkManager.networks.filter(item => item.group !== 'others' || item.id === 'others').concat([{
+        //   fullName: 'Custom Network',
+        //   group: 'others',
+        //   icon: 'fas fa-vial',
+        //   id: 'custom',
+        //   name: 'Custom',
+        //   notification: `${t('network.network.switchedTo')} <b>Custom</b> ${t('network.network.networkLow')}.`,
+        //   symbol: 'ETH',
+        //   url: '',
+        // }]).concat(customeNetworkGroup)
+        // networkManager.addNetworks(newNetworks)
+        // this.setState({ pending: false, status: null })
+        // this.modal.current.closeModal()
+      }
   }
 
   connect = async option => {
     try {
       const status = await networkManager.updateCustomNetwork(option)
-      if (status) {
+      if (!!status) {
         redux.dispatch('UPDATE_UI_STATE', { customNetworkOption: option })
         redux.dispatch('CHANGE_NETWORK_STATUS', true)
         headerActions.updateNetwork(option.name)
@@ -137,6 +156,13 @@ export default class CustomNetworkModal extends PureComponent {
         confirmDisabled={!option.hostName || !option.orgId || !option.chainId || !option.ipAdress || !option.pem}>
         <DebouncedFormGroup
           ref={this.input}
+          label='Name'
+          maxLength='50'
+          value={option.name}
+          onChange={name => this.setState({ option: { ...option, name } })}
+          validator={v => !/^[0-9a-zA-Z\-_]*$/.test(v) && 'Network name can only contain letters, digits, dash or underscore.'}
+        />
+        <DebouncedFormGroup
           label='Host Name'
           maxLength='50'
           value={option.hostName}
@@ -149,7 +175,13 @@ export default class CustomNetworkModal extends PureComponent {
           value={option.orgId}
           onChange={orgId => this.setState({ option: { ...option, orgId } })}
           placeholder='Please enter the organization Id'
-          validator={v => !/^[0-9a-zA-Z\-_]*$/.test(v) && 'orgId can only contain letters, digits, dash or underscore.'}
+        />
+        <KeypairInputSelector
+          abbreviationOption
+          size='sm'
+          label='User'
+          value={option.user}
+          onChange={user => this.setState({ option: { ...option, user }})}
         />
         <DebouncedFormGroup
           label='ChainId'
@@ -171,7 +203,7 @@ export default class CustomNetworkModal extends PureComponent {
           paddingBottom: '15px'
         }}>
           <Input type='checkbox' id='enablTls'
-            onChange={tlsEnable => this.setState({ option: { ...option, tlsEnable } })}
+            onChange={tlsEnable => this.setState({ option: { ...option, tlsEnable: !option.tlsEnable } })}
             checked={option.tlsEnable} />
           <Label check htmlFor='enablTls'>Enable TTLS</Label>
         </FormGroup>

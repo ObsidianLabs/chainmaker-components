@@ -9,9 +9,8 @@ module.exports = class SdkChannel extends IpcChannel {
     this.classList = {}
   }
 
-  
-
   init({ initSDkData, initUserData }) {
+    this.dispose()
     this.sdkclient.initSDK(initSDkData)
     this.sdkclient.initUserList(initUserData)
     this.sdkclient.initMethods()
@@ -22,13 +21,17 @@ module.exports = class SdkChannel extends IpcChannel {
     return this.sdkclient.invokeMethods(methodName, ...data)
   }
 
-  async callContract (className, funcName, params){
+  async callContract(className, funcName, params) {
     if (params.userInfoList) {
       params.userInfoList = await this.sdkclient.initUserListWithCurrentOrg(params.userInfoList)
     }
-    let res =  await this.sdkclient.sdkInstance[className][funcName](params)
+    let res = await this.sdkclient.sdkInstance[className][funcName](params)
     console.log(res)
     return res
+  }
+
+  dispose() {
+    this.sdkclient.dispose()
   }
 }
 

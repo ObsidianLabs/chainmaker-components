@@ -101,5 +101,9 @@ export default class InvokeClient {
     return ''
   }
 
-  dispose() {}
+  dispose() {
+    if (platform.isDesktop) {
+      this.channel.invoke('dispose')
+    }
+  }
 }

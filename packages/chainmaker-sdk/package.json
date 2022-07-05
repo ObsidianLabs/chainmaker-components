@@ -23,7 +23,7 @@
     "fastify": "^3.20.2",
     "js-conflux-sdk": "^2.0.7",
     "json-rpc-engine": "^6.1.0",
-    "chainmaker-sdk": "git+ssh://git@github.com:ObsidianLabs/chainmaker-sdk.git"
+    "chainmaker-sdk": "git+https://git@github.com/ObsidianLabs/chainmaker-sdk.git"
   },
   "devDependencies": {
     "@babel/core": "^7.7.5",

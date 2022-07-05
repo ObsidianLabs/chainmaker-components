@@ -19,9 +19,9 @@ const {
   PROJECT_GITHUB_REPO
 } = process.env
 const tutorialPanelInfo = {
-  description: `Black IDE is a graphic IDE for developing smart contracts on the Ethereum blockchian. New here ? Don't worry.
+  description: `Chainmaker IDE is a graphic IDE for developing smart contracts on the Ethereum blockchian. New here ? Don't worry.
 Here is an instruction for a quick scan and details of each features.`,
-  tips: 'To get started, please install the prerequisite tools for Black IDE',
+  tips: 'To get started, please install the prerequisite tools for Chainmaker IDE',
   nextPage: `${PROJECT_GITHUB_REPO}/blob/master/README.md`
 }
 
@@ -104,7 +104,7 @@ export default class Welcome extends PureComponent {
           }}>
             <div className='center'>
               <div className='tutorialPanel' />
-              <p>Learn how to use Black IDE</p>
+              <p>Learn how to use Chainmaker IDE</p>
             </div>
 
             <Button

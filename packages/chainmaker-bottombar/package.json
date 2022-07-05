@@ -1,7 +1,7 @@
 {
   "name": "@obsidians/chainmaker-bottombar",
   "version": "0.3.0",
-  "description": "Black IDE bottom bar",
+  "description": "Chainmaker IDE bottom bar",
   "author": "Phil <qft.gtr@gmail.com>",
   "license": "GPL-3.0",
   "source": "src/index.js",

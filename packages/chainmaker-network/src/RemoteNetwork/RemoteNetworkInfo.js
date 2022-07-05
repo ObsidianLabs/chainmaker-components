@@ -1,11 +1,9 @@
-import React, { PureComponent, useLayoutEffect } from 'react'
-
+import React, { PureComponent } from 'react'
 import {
   TableCard,
   TableCardRow,
 } from '@obsidians/ui-components'
 import { t } from '@obsidians/i18n'
-
 import moment from 'moment'
 import networkManager from '../networkManager'
 

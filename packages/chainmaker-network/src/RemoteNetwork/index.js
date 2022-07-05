@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react'
 import redux from '@obsidians/redux'
 import notification from '@obsidians/notification'
 import { t } from '@obsidians/i18n'
-
 import networkManager from '../networkManager'
 import DefaultRemoteNetworkInfo from './RemoteNetworkInfo'
 
@@ -12,6 +11,7 @@ export default class RemoteNetwork extends PureComponent {
     this.state = {
       info: null,
       status: null,
+      url: ''
     }
   }
 
@@ -43,6 +43,7 @@ export default class RemoteNetwork extends PureComponent {
     }
     this.refreshBlock()
     const networkId = this.props.networkId
+    this.url = networkManager.current?.url || ''
     try {
       const info = await networkManager.sdk?.networkInfo()
       if (this.props.networkId === networkId) {
@@ -78,7 +79,6 @@ export default class RemoteNetwork extends PureComponent {
   render () {
     const {
       networkId,
-      url,
       EditButton,
       RemoteNetworkInfo = DefaultRemoteNetworkInfo,
     } = this.props
@@ -88,7 +88,7 @@ export default class RemoteNetwork extends PureComponent {
       <div className='d-flex flex-1 flex-column overflow-auto'>
         <RemoteNetworkInfo
           networkId={networkId}
-          url={url}
+          url={this.url}
           EditButton={EditButton}
           info={info}
           status={status}

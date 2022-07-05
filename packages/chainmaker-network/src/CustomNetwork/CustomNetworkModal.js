@@ -67,32 +67,6 @@ export default class CustomNetworkModal extends PureComponent {
     redux.dispatch('CHANGE_NETWORK_STATUS', false)
     redux.dispatch('SELECT_NETWORK', '')
     notification.error(t('network.network.network'), t('network.network.networkDisconnect'))
-
-    // console.log('option', option)
-    // console.log('keepConnect', keepConnect)
-    // try {
-    //   this.setState({ connecting: option.name })
-    // const newOption = networkManager.getCustomNetParams(option)
-    // console.log('end', newOption)
-    //   const status = await networkManager.updateCustomNetwork({
-    //     url: newOption.url,
-    //     name: newOption.name,
-    //     option: newOption,
-    //     notify: true
-    //   })
-    //   console.log('connect', status)
-    //   if (status) {
-    //     this.setState({ connecting: newOption.name })
-        // redux.dispatch('SELECT_NETWORK', network.id)
-        // const connectCustomeNetwork = networkManager.networks?.find(item => item.id == option.name)
-        // networkManager.setNetwork(connectCustomeNetwork)
-    //     this.modal.current?.closeModal()
-    //     return
-    //   }
-    // } catch (e) { 
-    //   notification.error(t('network.custom.err'), t('network.custom.errText'))
-    //   this.setState({ connecting: '' })
-    // }
   }
 
   renderTableBody = () => {
@@ -101,6 +75,7 @@ export default class CustomNetworkModal extends PureComponent {
     customNetworks.sort((a, b) => a[0].localeCompare(b[0]))
     if (customNetworks.length) {
       return customNetworks.map(([name, item], i) => {
+        const hostName = item.get('nodeConfigArray')?.[0]?.options?.hostName || ''
         return (
           <tr key={`custom-network-${i}`} className='hover-flex'>
             <td className='d-flex'>
@@ -116,7 +91,7 @@ export default class CustomNetworkModal extends PureComponent {
                 </UncontrolledTooltip>
               }
             </td>
-            <td className='text-overflow-dots'>{item.get('nodeConfigArray')[0].options.hostName}</td>
+            <td className='text-overflow-dots'>{hostName}</td>
             <td align='right'>
               <div className='d-flex align-items-center justify-content-between'>
                 <Button
@@ -198,7 +173,8 @@ export default class CustomNetworkModal extends PureComponent {
           {connected ? networkConnectingText : networkNotConnectedText}
         </div>
       </Modal>
-      <NewCustomNetworkModal ref={this.newConnectionModal} />
+      <NewCustomNetworkModal
+        ref={this.newConnectionModal} />
     </>
   }
 }

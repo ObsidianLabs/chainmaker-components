@@ -28,8 +28,9 @@ export default class CustomNetworkModal extends PureComponent {
   }
 
   openModal = (modify = false, newOption = {}) => {
-    if (Object.keys(newOption).length) {
+    if (Object.keys(newOption).length && modify) {
       this.name = newOption.name
+      this.originalOption = JSON.parse(JSON.stringify(newOption))
       const { orgId, chainId, nodeConfigArray, name } = newOption
       const { nodeAddr, tlsEnable, options: { hostName, pem } } = nodeConfigArray[0]
       this.setState({
@@ -67,61 +68,28 @@ export default class CustomNetworkModal extends PureComponent {
     const networkInfo = await networkManager.updateCustomNetwork({
       url: newOption.url,
       name: newOption.name,
-      option: newOption,
+      option: newOption
     })
-    if (!!networkInfo) {
-      this.setState({ pending: false, status: true })
-      return
-    }
-    this.setState({ pending: false })
+    this.setState({
+      pending: false,
+      status: !!networkInfo ? true : false
+    })
   }
 
   onConfirm = async () => {
     const { modify, status, option, originalOption } = this.state
     const customNetworkMap = redux.getState().customNetworks.toJS()
-
     const customNetworkNames = Object.keys(customNetworkMap);
-    const connected = customNetworkMap[option.name]?.active;
+    // const connected = customNetworkMap[option.name]?.active;
   
     if (customNetworkNames.includes(option.name) && !modify) {
       notification.error(t('network.custom.invalidName'), t('network.custom.invalidNameText', { name: option.name }))
       return
     }
-
-    if (!status) {
-      this.tryCreateSdk({ ...option, notify: false })
-      this.modal.current?.closeModal()
-    } else {
-      if (modify) {
-        redux.dispatch('MODIFY_CUSTOM_NETWORK', { name: this.name, option })
-      } else {
-        redux.dispatch('ADD_CUSTOM_NETWORK', option)
-      }
-        // const customeNetworkMap = redux.getState().customNetworks.toJS()
-        // const customeNetworkGroup = Object.keys(customeNetworkMap).map(name => ({
-        //   group: 'others',
-        //   icon: 'fas fa-vial',
-        //   id: name,
-        //   networkId: name,
-        //   name: name,
-        //   fullName: name,
-        //   notification: `${t('network.network.switchedTo')} <b>${name}</b>.`,
-        //   url: customeNetworkMap[name].url,
-        // })).sort((a, b) => a.name.localeCompare(b.name))
-        // const newNetworks = networkManager.networks.filter(item => item.group !== 'others' || item.id === 'others').concat([{
-        //   fullName: 'Custom Network',
-        //   group: 'others',
-        //   icon: 'fas fa-vial',
-        //   id: 'custom',
-        //   name: 'Custom',
-        //   notification: `${t('network.network.switchedTo')} <b>Custom</b> ${t('network.network.networkLow')}.`,
-        //   symbol: 'ETH',
-        //   url: '',
-        // }]).concat(customeNetworkGroup)
-        // networkManager.addNetworks(newNetworks)
-        // this.setState({ pending: false, status: null })
-        // this.modal.current.closeModal()
-      }
+    modify && redux.dispatch('REMOVE_CUSTOM_NETWORK', this.originalOption)
+    this.tryCreateSdk({ ...option, notify: true })
+    this.setState({ pending: false, status: null })
+    this.modal.current?.closeModal()
   }
 
   connect = async option => {

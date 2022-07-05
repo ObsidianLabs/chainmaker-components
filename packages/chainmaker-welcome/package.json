@@ -1,7 +1,7 @@
 {
   "name": "@obsidians/chainmaker-welcome",
   "version": "0.3.0",
-  "description": "Black IDE welcome screen",
+  "description": "Chainmaker IDE welcome screen",
   "author": "Phil <qft.gtr@gmail.com>",
   "license": "GPL-3.0",
   "source": "src/index.js",

@@ -68,9 +68,8 @@ export default connect(['network', 'customNetworks', 'uiState', 'customNetworkMo
       </>
     )
   } else {
-    const url = networkManager.current?.url || ''
     return <>
-      <RemoteNetwork networkId={networkId} url={url} />
+      <RemoteNetwork networkId={networkId} />
       {customNetworkModalBody()}
     </>
   }

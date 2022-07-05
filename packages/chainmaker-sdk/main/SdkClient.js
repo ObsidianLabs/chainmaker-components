@@ -31,8 +31,6 @@ module.exports = class SdkClient {
     this.currentConfig = {}
   }
 
-
-
    saveToTemp({ userKeyString, userCertString }) {
     this.userKeyPathFile = path.join(os.tmpdir(), 'tempUser.key')
     this.userCrtPathFile = path.join(os.tmpdir(), 'tempUser.crt')
@@ -104,21 +102,19 @@ module.exports = class SdkClient {
   }
 
   initMethods() {
-    const callMethods = (sdk, methods) => (name, ...data) => {
-      methods[name](sdk, ...data)
-    }
+    const callMethods = (sdk, methods) => (name, ...data) => methods[name](sdk, ...data)
     this.callSdkMethods = callMethods(this.sdkInstance, methods)
     this.callContractMethods = callMethods(this.sdkInstance.userContractMgr, methods)
   }
 
   invokeMethods(name, ...data) {
-   return this.callSdkMethods(name, ...data)
+    return this.callSdkMethods(name, ...data)
   }
 
   invokeContractMethods(name, ...data) {
     return this.callContractMethods(name, ...data)
   }
-  
+
   dispose() {
     this.sdkInstance = null
     this.sdkMethods = null

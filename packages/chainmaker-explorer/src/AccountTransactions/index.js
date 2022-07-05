@@ -128,11 +128,11 @@ export default class AccountTransactions extends PureComponent {
 
 const TransactionHeader = () => (
   <tr>
-    <th style={{ width: '6%', textAlign: 'left'}}>{'BlockHeight'}</th>
+    <th style={{ width: '10%', textAlign: 'left'}}>{'Block Height'}</th>
     <th style={{ width: '14%', textAlign: 'left' }}>{'TxId'}</th>
     <th style={{ width: '17%', textAlign: 'left' }}>{'signer'}</th>
     {/* <th style={{ width: '15%', textAlign: 'center'}}>{'From'}</th> */}
-    <th style={{ width: '17%', textAlign: 'left'}}>{'Target Contract'}</th>
+    <th style={{ width: '14%', textAlign: 'left'}}>{'Target Contract'}</th>
     <th style={{ width: '8%',  textAlign: 'left' }}>{'Deploy Time'}</th>
     <th style={{ width: '15%', textAlign: 'left' }}>{'Status'}</th>
   </tr>

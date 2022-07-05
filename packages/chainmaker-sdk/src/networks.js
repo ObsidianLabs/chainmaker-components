@@ -1,4 +1,4 @@
-// import platform from '@obsidians/platform'
+import platform from '@obsidians/platform'
 import { t } from '@obsidians/i18n'
 
 const PEM = [
@@ -172,6 +172,21 @@ const networks = [
   //   userCertString: ''
   // }
 ]
+
+if (platform.isDesktop) {
+  networks.unshift({
+    id: 'dev',
+    group: 'default',
+    name: 'Development',
+    fullName: 'Development',
+    icon: 'fas fa-laptop-code',
+    notification: `${t('network.network.switchedTo')} <b>Ethereum Instances for Development</b> ${t('network.network.networkLow')}.`,
+    url: 'http://localhost:8545',
+    chainId: 0,
+    symbol: 'ETH',
+  })
+}
+
 export default networks
 
 export const customNetworks = [

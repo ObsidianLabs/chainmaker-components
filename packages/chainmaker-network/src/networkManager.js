@@ -4,7 +4,6 @@ import notification from '@obsidians/notification'
 import redux from '@obsidians/redux'
 import { t } from '@obsidians/i18n'
 import keypairManager from '@obsidians/keypair'
-
 import { getCachingKeys, dropByCacheKey } from 'react-router-cache-route'
 
 class NetworkManager {
@@ -77,6 +76,7 @@ class NetworkManager {
       chainId: chainId,
       orgId: orgId,
       url: ipAdress,
+      group: 'others',
       nodeConfigArray: [
         {
           nodeAddr: ipAdress,
@@ -96,13 +96,16 @@ class NetworkManager {
   }
 
   async updateCustomNetwork({ url, name, option = {}, notify = true }) {
+    redux.dispatch('ADD_CUSTOM_NETWORK', option)
+    const networkIndex = this.networks.findIndex(n => n.id === option.id)
+    if (networkIndex !== -1) {
+      this.networks[networkIndex] = option
+    }
     const info = await this.createSdk(option, true)
-
-
-    if (info && notify) {
+    if (!!info && notify) {
       redux.dispatch('SELECT_NETWORK', option.name)
       redux.dispatch('CHANGE_NETWORK_STATUS', true)
-      redux.dispatch('ADD_CUSTOM_NETWORK', option)
+      redux.dispatch('ACTIVE_CUSTOM_NETWORK', option)
       notification.success(t('network.network.connected'), `${t('network.network.connectedTo')} <b>${name || url}</b>`)
     }
 
@@ -134,7 +137,6 @@ class NetworkManager {
     }
     if (!Sdk) return null
    
-
     params.nodeConfigArray[0].options = {
       ...nodeConfigArray[0].options,
       clientKey: userKeys.tlsKey,

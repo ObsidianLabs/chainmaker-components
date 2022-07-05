@@ -66,7 +66,7 @@ class NodeManager {
       `-p 12301:12301`,
       `-v ${process.env.PROJECT}-${name}:/data`,
       `-w /data/nodeconfig/config`,
-      `--platform linux/amd64`,
+      // `--platform linux/amd64`,
       `${process.env.DOCKER_IMAGE_NODE}:${version}`,
       `/chainmaker-go/bin/chainmaker start -c /data/nodeconfig/config/chainmaker.yml`
     ].join(' ')

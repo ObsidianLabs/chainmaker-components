@@ -341,7 +341,7 @@ export class CompilerManager {
     const cmd = [
       `docker run -t --rm --name solidity-compile`,
       `-v "${projectDir}:/home"`,
-      `--platform linux/amd64`,
+      // `--platform linux/amd64`,
       `${process.env.DOCKER_IMAGE_COMPILER}:2.0.0`,
       `bash -c "cd /data`,
       `&& tar xvf contract_solidity_template.tar.gz`,

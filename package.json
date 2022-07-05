@@ -15,8 +15,7 @@
     "packages/*",
     "../eth-components/packages/*",
     "../electron-components/packages/*",
-    "../eth-components/packages/*",
-    "../chainmaker-sdk"
+    "../eth-components/packages/*"
   ],
   "devDependencies": {
     "danger": "^11.0.2"

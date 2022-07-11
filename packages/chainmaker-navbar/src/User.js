@@ -181,9 +181,7 @@ class User extends Component {
       >
         <DropdownToggle tag='div' className='nav-dropdown-toggle px-2'>
           <div className='d-flex bg-secondary align-items-center justify-content-center user-avatar'>
-            {
-              this.state.loaded && profile.get('avatar') ? <img className='user-avatar' src={profile.get('avatar')} crossOrigin='true' /> : <span><span className='fa fa-user-alt' /></span>
-            }
+             <span><span className='fa fa-user-alt' /></span>
           </div>
         </DropdownToggle>
         {this.renderDropdownMenus(profile)}

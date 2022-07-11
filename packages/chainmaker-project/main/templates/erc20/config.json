@@ -1,6 +1,6 @@
 {
-  "main": "./contracts/Token.sol",
-  "deploy": "./build/contracts/Token.json",
+  "main": "./contracts/token.sol",
+  "deploy": "./build/contracts/token.json",
   "framework": "#framework",
   "compilers": {
     "solc": "0.8.0"

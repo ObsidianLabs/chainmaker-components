@@ -8,7 +8,6 @@ import { networkManager } from '@obsidians/chainmaker-network'
 import { utils } from '@obsidians/sdk'
 import { t } from '@obsidians/i18n'
 import headerActions from './headerActions'
-import metamaskIcon from './assets/metamask.png'
 
 export default class Header extends PureComponent {
   constructor(props) {
@@ -17,8 +16,6 @@ export default class Header extends PureComponent {
       keypairs: []
     }
 
-    this.updateDropdownKeypairs = this.updateDropdownKeypairs.bind(this)
-    this.updateDropDownBrowserAccount = this.updateDropDownBrowserAccount.bind(this)
     this.updatedDropdownStarred = this.updatedDropdownStarred.bind(this)
     this.updateDropdownStarredContract = this.updateDropdownStarredContract.bind(this)
     this.updateContractName = this.updateContractName.bind(this)
@@ -30,55 +27,6 @@ export default class Header extends PureComponent {
   }
 
   updateKeypairs = keypairs => this.setState({ keypairs })
-
-  updateDropdownKeypairs(keypairManagerFilter, addressIcon) {
-    let result = this.state.keypairs.map(k => {
-      return {
-        id: k.address,
-        name: k.name ||
-          <code className='small'>
-            {utils.isValidAddressReturn(k.address).substr(0, 10)}
-            ...{utils.isValidAddressReturn(k.address).substr(-8)}
-          </code>,
-        icon: addressIcon,
-      }
-    })
-
-    result = keypairManagerFilter ? result.filter(keypairManagerFilter) : result
-    !result.length && result.push({ none: true })
-
-    result.unshift({ header: 'keypair manager' })
-    return result
-  }
-
-  updateDropDownBrowserAccount(browserAccounts, addressIcon) {
-    let result = browserAccounts.map(item => {
-      return {
-        id: item,
-        name: keypairManager.getName(item) ||
-          <code className='small'>
-            {utils.isValidAddressReturn(item).substr(0, 10)}
-            ...{utils.isValidAddressReturn(item).substr(-8)}
-          </code>,
-        icon: addressIcon,
-      }
-    })
-    if (networkManager?.browserExtension) {
-      if (!networkManager.browserExtension.currentAccount) return []
-      result.unshift({
-        id: networkManager.browserExtension.currentAccount,
-        name:
-          <code className='small'>
-            {utils.isValidAddressReturn(networkManager.browserExtension.currentAccount).substr(0, 6)}
-            ...{utils.isValidAddressReturn(networkManager.browserExtension.currentAccount).substr(-4)}
-          </code>,
-        logoIcon: metamaskIcon,
-      })
-
-      result = [{ divider: true }, { header: networkManager.browserExtension.name.toLowerCase() }, ...result]
-    }
-    return result
-  }
 
   updatedDropdownStarred(starred, addressIcon) {
     const result = starred.map(item => {
@@ -150,8 +98,6 @@ export default class Header extends PureComponent {
     const contractIcon = isSelected => isSelected ? 'fas fa-file-invoice' : 'far fa-file'
     const addressIcon = isSelected => isSelected ? 'fas fa-map-marker-alt' : 'far fa-map-marker'
 
-    const dropdownKeypairs = this.updateDropdownKeypairs(keypairManagerFilter, addressIcon)
-    const dropdownBrowserAccounts = this.updateDropDownBrowserAccount(browserAccounts, addressIcon)
     const dropdownStarred = this.updatedDropdownStarred(starred, addressIcon)
     const dropdownStarredInContract = this.updateDropdownStarredContract(starredContracts, addressIcon, contractIcon, extraContractItems)
     const contractName = this.updateContractName(selectedContract, extraContractItems)
